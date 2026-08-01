@@ -270,3 +270,13 @@ body {
   flex: 0 0 20px;
   color: var(--text-muted);
 }
+
+.dept-role-name {
+  flex: 0 0 64px;
+  color: var(--text-muted);
+}
+
+.section-note {
+  margin: -8px 0 16px;
+  color: var(--text-muted);
+}

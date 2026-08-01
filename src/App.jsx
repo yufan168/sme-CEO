@@ -1,4 +1,5 @@
 import { departments } from './departments.js'
+import { authority, authorityNote } from './authority.js'
 
 function App() {
   return (
@@ -28,7 +29,7 @@ function App() {
           </div>
           <div className="info-row">
             <dt>主要業務</dt>
-            <dd>AI 公司管理系統開發</dd>
+            <dd>企業管理顧問、政府計畫輔導</dd>
           </div>
           <div className="info-row">
             <dt>負責人</dt>
@@ -96,6 +97,33 @@ function App() {
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="section">
+        <h2 className="section-title">人力配置與授權</h2>
+        <p className="section-note">{authorityNote}</p>
+        <div className="dept-grid">
+          {authority.map((row) => (
+            <article className="dept-card" key={row.name}>
+              <h3 className="dept-name">{row.name}</h3>
+
+              <div className="dept-block">
+                <p className="dept-role">
+                  <span className="dept-role-name">負責人</span>
+                  <span>{row.owner}</span>
+                </p>
+                <p className="dept-role">
+                  <span className="dept-role-name">委任顧問</span>
+                  <span>{row.consultant}</span>
+                </p>
+                <p className="dept-role">
+                  <span className="dept-role-name">臨時行政</span>
+                  <span>{row.admin}</span>
+                </p>
               </div>
             </article>
           ))}
