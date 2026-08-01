@@ -181,7 +181,7 @@ export function WarRoomPage({ onNavigate }) {
             ))}
           </p>
           <p className="dept-step-reason">
-            五條業務線共用同一條。每一關的人工責任見部門分頁。
+            七條業務線共用同一條。每一關的人工責任見部門分頁。
           </p>
         </article>
       </section>
