@@ -1,6 +1,8 @@
 export const opsTeam = {
-  department: '營運管理部',
+  department: '營運與財務管理部',
   note: '四個 Agent 擔任營運助理，負責資訊整理、異常提醒與摘要產出。所有涉及人員調度、工作指派與營運決策的事項，一律由負責人執行。',
+  scopeNote:
+    '本配置涵蓋每日營運的資訊整理流程。合約、請款與核銷的 Agent 配置尚未定義，待後續補上。',
   flow: [
     { step: '彙整今日營運資訊', owner: 'Agent：營運資訊整理員（Worker）' },
     { step: '整理待辦事項', owner: 'Agent：待辦整理員（Worker）' },
@@ -15,7 +17,7 @@ export const opsTeam = {
       id: '01',
       name: '營運資訊整理員',
       type: 'Worker 執行員',
-      duty: '彙整今日訂單、庫存、生產與行程等營運資訊。',
+      duty: '彙整今日案件進度、工時、應收付款與行程等營運資訊。',
       assignee: '待指派',
       step: '彙整今日營運資訊',
     },
@@ -31,7 +33,7 @@ export const opsTeam = {
       id: '03',
       name: '營運監測員',
       type: 'Knowledge 知識員',
-      duty: '依據既有營運規則找出可能需要注意的異常狀況。',
+      duty: '依據既有營運規則找出需要注意的異常，例如逾期案件、逾期應收與即將到期的計畫期限。',
       assignee: '待指派',
       step: '檢查異常狀況',
     },

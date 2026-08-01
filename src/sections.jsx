@@ -172,6 +172,7 @@ function AgentTeamSection({ team }) {
     <section className="card-group">
       <h2 className="group-title">Agent 配置：{team.department}</h2>
       <p className="group-note">{team.note}</p>
+      {team.scopeNote && <p className="group-note">{team.scopeNote}</p>}
 
       <article className="card dept-card">
         <h3 className="dept-name">流程與執行者</h3>
