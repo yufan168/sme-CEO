@@ -157,6 +157,7 @@ function App() {
           Agent 配置：{agentTeam.department}
         </h2>
         <p className="section-note">{agentTeam.note}</p>
+        <p className="section-note">{agentTeam.scopeNote}</p>
 
         <div className="dept-card agent-flow-card">
           <h3 className="dept-name">流程與執行者</h3>

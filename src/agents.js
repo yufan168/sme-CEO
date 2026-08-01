@@ -1,6 +1,8 @@
 export const agentTeam = {
   department: '客戶服務部',
   note: '三個 Agent 加兩個人工控制點。Router 只分類、Knowledge 只查資料、Worker 只寫草稿，審核與送出留給人。任何單一 Agent 都不能同時查資料、做判斷、寫答案並送出。',
+  scopeNote:
+    '此處只涵蓋單次問答的處理流程。部門藍圖中的客戶服務部描述的是服務全貌，還包含追蹤處理進度、確認結案與彙整常見問題，兩者層次不同，並非重複。',
   flow: [
     { step: '顧客來訊', owner: '不設 Agent，由既有客服管道接收' },
     { step: '判斷問題類型', owner: 'Router 分派員' },
