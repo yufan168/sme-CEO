@@ -7,7 +7,7 @@ import { callAI } from './callAI.js'
 export const companyContext = [
   '公司名稱：享洺有限公司',
   '產業：企業管理顧問',
-  '成立年份：2023 年',
+  '成立年份：2021 年',
   '規模：5 人以下',
   '主要業務：企業管理顧問、政府計畫輔導',
   '負責人：SUSU',

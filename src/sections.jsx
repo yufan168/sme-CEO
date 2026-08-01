@@ -64,7 +64,7 @@ export function HomePage({ onNavigate }) {
           </div>
           <div className="info-row">
             <dt>成立年份</dt>
-            <dd>2023 年</dd>
+            <dd>2021 年</dd>
           </div>
           <div className="info-row">
             <dt>規模</dt>
@@ -262,7 +262,7 @@ export function DepartmentsPage() {
   )
 }
 
-function BlueprintSection() {
+function BlueprintSection({ onNavigate }) {
   return (
     <>
       <section className="card-group">
@@ -274,9 +274,13 @@ function BlueprintSection() {
           <div className="dept-block">
             {blueprintOverview.map((row) => (
               <div className="dept-step" key={row.dept}>
-                <p className="dept-step-name">
+                <button
+                  type="button"
+                  className="jump-link"
+                  onClick={() => onNavigate('ai-staff', 'dept-' + row.dept)}
+                >
                   {row.dept}　{row.count} 個
-                </p>
+                </button>
                 <p className="dept-step-text">{row.scope}</p>
               </div>
             ))}
@@ -593,10 +597,10 @@ function AgentTeamSection({ team }) {
   )
 }
 
-export function AiStaffPage() {
+export function AiStaffPage({ onNavigate }) {
   return (
     <>
-      <BlueprintSection />
+      <BlueprintSection onNavigate={onNavigate} />
       <AgentTeamSection team={trainingTeam} />
       <AgentTeamSection team={governmentTeam} />
       <AgentTeamSection team={agentTeam} />
