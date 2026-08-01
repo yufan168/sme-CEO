@@ -3,6 +3,7 @@
   --text-muted: #888888;
   --border: #cccccc;
   --bg: #ffffff;
+  --surface: #f7f7f8;
 
   font-family: system-ui, 'Segoe UI', Roboto, 'Noto Sans TC', sans-serif;
   font-size: 16px;
@@ -17,20 +18,6 @@
 
 body {
   margin: 0;
-}
-
-.page {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 48px 20px;
-}
-
-.section + .section {
-  margin-top: 56px;
-}
-
-.home {
-  text-align: center;
 }
 
 .company-name {
@@ -56,7 +43,8 @@ body {
   cursor: pointer;
 }
 
-.section-title {
+.card-title,
+.group-title {
   font-size: 22px;
   font-weight: 600;
   margin: 0 0 16px;
@@ -212,8 +200,6 @@ body {
 
 .dept-card {
   padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
   align-self: start;
 }
 
@@ -276,12 +262,12 @@ body {
   color: var(--text-muted);
 }
 
-.section-note {
+.group-note {
   margin: -8px 0 16px;
   color: var(--text-muted);
 }
 
-.section-note + .section-note {
+.group-note + .group-note {
   margin-top: -8px;
 }
 
@@ -306,4 +292,200 @@ body {
 
 .agent-grid {
   margin: 0;
+}
+
+/* workspace shell */
+
+.workspace {
+  display: block;
+  min-height: 100vh;
+  background-color: var(--surface);
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  background-color: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 12px;
+  font: inherit;
+  color: var(--text);
+  text-align: left;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.sidebar-item:hover {
+  background-color: var(--surface);
+}
+
+.sidebar-item.is-active {
+  background-color: var(--surface);
+  border-color: var(--border);
+  font-weight: 600;
+}
+
+.sidebar-item.is-pending .sidebar-label {
+  color: var(--text-muted);
+}
+
+.sidebar-tag {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.sidebar-motto {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.workspace-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.topbar {
+  padding: 16px 20px;
+  background-color: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.topbar-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.page-content {
+  flex: 1 1 auto;
+  padding: 20px;
+}
+
+.card {
+  padding: 20px;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.card + .card,
+.card-group + .card-group {
+  margin-top: 20px;
+}
+
+.card-home {
+  text-align: center;
+}
+
+.card-pending {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 240px;
+}
+
+.pending-text {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.card-group .dept-card + .dept-card,
+.card-group .agent-grid {
+  margin-top: 16px;
+}
+
+.mermaid-figure svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+}
+
+.legend-start {
+  background-color: #f3f4f6;
+  border: 1px solid #9ca3af;
+}
+
+.legend-agent {
+  background-color: #e8f1ff;
+  border: 1px solid #4f7fc7;
+}
+
+.legend-human {
+  background-color: #fff0e5;
+  border: 1px solid #c56a2d;
+}
+
+@media (min-width: 900px) {
+  .workspace {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 0;
+    flex: 0 0 200px;
+    height: 100vh;
+    justify-content: space-between;
+    border-bottom: 0;
+    border-right: 1px solid var(--border);
+  }
+
+  .sidebar-nav {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 2px;
+  }
+
+  .sidebar-item {
+    justify-content: space-between;
+  }
+
+  .workspace-main {
+    flex: 1 1 auto;
+  }
+
+  .page-content {
+    padding: 24px;
+  }
 }

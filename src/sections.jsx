@@ -1,0 +1,332 @@
+import { departments } from './departments.js'
+import { authority, authorityNote } from './authority.js'
+import { businessLines, businessLinesNote } from './businessLines.js'
+import { agentTeam } from './agents.js'
+import { agentTeams, agentTeamsNote } from './agentTeams.js'
+import WorkflowDiagram from './WorkflowDiagram.jsx'
+
+export function HomePage() {
+  return (
+    <>
+      <section className="card card-home">
+        <h1 className="company-name">享洺有限公司</h1>
+        <p className="tagline">運用 AI 協助企業提升管理效率</p>
+        <button type="button" className="enter-button">
+          進入公司
+        </button>
+      </section>
+
+      <section className="card">
+        <h2 className="card-title">公司資訊</h2>
+        <dl className="info-list">
+          <div className="info-row">
+            <dt>產業</dt>
+            <dd>企業管理顧問</dd>
+          </div>
+          <div className="info-row">
+            <dt>成立年份</dt>
+            <dd>2026 年</dd>
+          </div>
+          <div className="info-row">
+            <dt>規模</dt>
+            <dd>5 人以下</dd>
+          </div>
+          <div className="info-row">
+            <dt>主要業務</dt>
+            <dd>企業管理顧問、政府計畫輔導</dd>
+          </div>
+          <div className="info-row">
+            <dt>負責人</dt>
+            <dd>SUSU</dd>
+          </div>
+        </dl>
+      </section>
+    </>
+  )
+}
+
+export function OrgPage() {
+  return (
+    <section className="card">
+      <h2 className="card-title">組織架構</h2>
+      <div className="org-chart">
+        <div className="org-node org-root">享洺有限公司</div>
+        <div className="org-stem"></div>
+        <ul className="org-children">
+          {departments.map((dept) => (
+            <li className="org-child" key={dept.name}>
+              <div className="org-node">{dept.name}</div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+export function DepartmentsPage() {
+  return (
+    <>
+      <section className="card-group">
+        <h2 className="group-title">部門藍圖</h2>
+        <div className="dept-grid">
+          {departments.map((dept) => (
+            <article className="card dept-card" key={dept.name}>
+              <h3 className="dept-name">{dept.name}</h3>
+              <p className="dept-duty">{dept.duty}</p>
+
+              <div className="dept-block">
+                <h4 className="dept-label">工作流程</h4>
+                <p className="dept-flow">
+                  {dept.flow.map((step, index) => (
+                    <span key={step}>
+                      {index > 0 && <span className="dept-arrow"> → </span>}
+                      {step}
+                    </span>
+                  ))}
+                </p>
+              </div>
+
+              <div className="dept-block">
+                <h4 className="dept-label">AI 與人的分工</h4>
+                {dept.split.map((row) => (
+                  <div className="dept-step" key={row.step}>
+                    <p className="dept-step-name">{row.step}</p>
+                    <p className="dept-role">
+                      <span className="dept-role-tag">AI</span>
+                      <span>{row.ai}</span>
+                    </p>
+                    <p className="dept-role">
+                      <span className="dept-role-tag">人</span>
+                      <span>{row.human}</span>
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="dept-block">
+                <h4 className="dept-label">人必須保留的核心權責</h4>
+                <ul className="dept-list">
+                  {dept.core.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="card-group">
+        <h2 className="group-title">人力配置與授權</h2>
+        <p className="group-note">{authorityNote}</p>
+        <div className="dept-grid">
+          {authority.map((row) => (
+            <article className="card dept-card" key={row.name}>
+              <h3 className="dept-name">{row.name}</h3>
+              <div className="dept-block">
+                <p className="dept-role">
+                  <span className="dept-role-name">負責人</span>
+                  <span>{row.owner}</span>
+                </p>
+                <p className="dept-role">
+                  <span className="dept-role-name">委任顧問</span>
+                  <span>{row.consultant}</span>
+                </p>
+                <p className="dept-role">
+                  <span className="dept-role-name">臨時行政</span>
+                  <span>{row.admin}</span>
+                </p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="card-group">
+        <h2 className="group-title">業務線與部門對應</h2>
+        <p className="group-note">{businessLinesNote}</p>
+        <div className="dept-grid">
+          {businessLines.map((line) => (
+            <article className="card dept-card" key={line.name}>
+              <h3 className="dept-name">{line.name}</h3>
+              <div className="dept-block">
+                {line.rows.map((row) => (
+                  <div className="dept-step" key={row.dept}>
+                    <p className="dept-step-name">{row.dept}</p>
+                    <p className="dept-step-text">{row.work}</p>
+                  </div>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    </>
+  )
+}
+
+export function AiStaffPage() {
+  return (
+    <>
+      <section className="card-group">
+        <h2 className="group-title">Agent 配置：{agentTeam.department}</h2>
+        <p className="group-note">{agentTeam.note}</p>
+        <p className="group-note">{agentTeam.scopeNote}</p>
+
+        <article className="card dept-card">
+          <h3 className="dept-name">流程與執行者</h3>
+          <div className="dept-block">
+            {agentTeam.flow.map((item) => (
+              <div className="dept-step" key={item.step}>
+                <p className="dept-step-name">{item.step}</p>
+                <p className="dept-step-text">{item.owner}</p>
+                <p className="dept-step-reason">{item.reason}</p>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <div className="dept-grid agent-grid">
+          {agentTeam.agents.map((agent) => (
+            <article className="card dept-card" key={agent.id}>
+              <h3 className="dept-name">
+                {agent.id}　{agent.name}
+              </h3>
+              <p className="agent-type">{agent.type}</p>
+              <p className="dept-duty">{agent.duty}</p>
+              <p className="dept-role">
+                <span className="dept-role-name">負責人</span>
+                <span>{agent.assignee}</span>
+              </p>
+
+              <div className="dept-block">
+                <h4 className="dept-label">{agent.scopeLabel}</h4>
+                <ul className="dept-list">
+                  {agent.scope.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+
+              {agent.output && (
+                <div className="dept-block">
+                  <h4 className="dept-label">{agent.outputLabel}</h4>
+                  <ul className="dept-list">
+                    {agent.output.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="dept-block">
+                <h4 className="dept-label">不能做</h4>
+                <ul className="dept-list">
+                  {agent.limits.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="dept-block">
+                <p className="dept-step-text">{agent.rule}</p>
+              </div>
+            </article>
+          ))}
+
+          {agentTeam.gates.map((gate) => (
+            <article className="card dept-card" key={gate.name}>
+              <h3 className="dept-name">{gate.name}</h3>
+              <div className="dept-block">
+                <ul className="dept-list">
+                  {gate.items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+              {gate.decisions && (
+                <div className="dept-block">
+                  <h4 className="dept-label">{gate.decisionLabel}</h4>
+                  <ul className="dept-list">
+                    {gate.decisions.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              <div className="dept-block">
+                <p className="dept-step-text">{gate.rule}</p>
+              </div>
+            </article>
+          ))}
+
+          <article className="card dept-card">
+            <h3 className="dept-name">本階段不配置</h3>
+            <div className="dept-block">
+              {agentTeam.notConfigured.map((item) => (
+                <div className="dept-step" key={item.type}>
+                  <p className="dept-step-name">{item.type}</p>
+                  <p className="dept-step-text">{item.reason}</p>
+                </div>
+              ))}
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section className="card-group">
+        <h2 className="group-title">其他部門的 Agent 配置</h2>
+        <p className="group-note">{agentTeamsNote}</p>
+        <div className="dept-grid">
+          {agentTeams.map((team) => (
+            <article className="card dept-card" key={team.department}>
+              <h3 className="dept-name">{team.department}</h3>
+
+              <div className="dept-block">
+                <h4 className="dept-label">Agent</h4>
+                {team.agents.map((agent) => (
+                  <div className="dept-step" key={agent.name}>
+                    <p className="dept-step-name">{agent.name}</p>
+                    <p className="dept-step-reason">{agent.type}</p>
+                    <p className="dept-step-text">{agent.duty}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="dept-block">
+                <h4 className="dept-label">留人的控制點</h4>
+                <ul className="dept-list">
+                  {team.gates.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="dept-block">
+                <p className="dept-step-text">{team.note}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    </>
+  )
+}
+
+export function WorkflowPage() {
+  return (
+    <section className="card">
+      <h2 className="card-title">客服回覆工作流程</h2>
+      <WorkflowDiagram />
+    </section>
+  )
+}
+
+export function PendingPage() {
+  return (
+    <section className="card card-pending">
+      <p className="pending-text">此分頁待建</p>
+    </section>
+  )
+}
