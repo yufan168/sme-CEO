@@ -62,13 +62,27 @@ export function OrgPage() {
   return (
     <section className="card">
       <h2 className="card-title">組織架構</h2>
+      <p className="group-note">
+        公司之下為六個部門，各部門之下為該部門的 AI Agent。人工控制點不列為節點，
+        由部門與工作流程規格承接。
+      </p>
       <div className="org-chart">
         <div className="org-node org-root">享洺有限公司</div>
         <div className="org-stem"></div>
         <ul className="org-children">
-          {departments.map((dept) => (
-            <li className="org-child" key={dept.name}>
-              <div className="org-node">{dept.name}</div>
+          {blueprint.map((dept) => (
+            <li className="org-child" key={dept.department}>
+              <div className="org-node org-dept">{dept.department}</div>
+              <ul className="org-grandchildren">
+                {dept.agents.map((agent) => (
+                  <li className="org-grandchild" key={agent.id}>
+                    <div className="org-node org-agent">
+                      <span className="org-agent-id">{agent.id}</span>
+                      {agent.name}
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </li>
           ))}
         </ul>
