@@ -605,3 +605,32 @@ body {
   background-color: var(--brand-brown);
   border-color: var(--brand-brown);
 }
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 12px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-weight: 700;
+  color: var(--brand-brown);
+  background-color: var(--brand-gold);
+  border-radius: 6px;
+}
+
+.sidebar-brand-name {
+  color: var(--warm-white);
+  font-weight: 600;
+}
+
+.sidebar-nav {
+  overflow-y: auto;
+}

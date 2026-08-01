@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   HomePage,
   OrgPage,
@@ -23,12 +23,22 @@ const pages = [
 
 function App() {
   const [activeId, setActiveId] = useState('home')
+  const contentRef = useRef(null)
   const active = pages.find((page) => page.id === activeId)
   const Content = active.render ?? PendingPage
+
+  useEffect(() => {
+    contentRef.current?.scrollTo(0, 0)
+    window.scrollTo(0, 0)
+  }, [activeId])
 
   return (
     <div className="workspace">
       <aside className="sidebar">
+        <div className="sidebar-brand">
+          <span className="sidebar-mark">洺</span>
+          <span className="sidebar-brand-name">享洺有限公司</span>
+        </div>
         <nav className="sidebar-nav">
           {pages.map((page) => (
             <button
@@ -53,7 +63,7 @@ function App() {
         <header className="topbar">
           <h1 className="topbar-title">{active.label}</h1>
         </header>
-        <main className="page-content">
+        <main className="page-content" ref={contentRef}>
           <Content />
         </main>
       </div>

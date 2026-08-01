@@ -196,6 +196,10 @@ export function AiStaffPage() {
               <p className="agent-type">{agent.type}</p>
               <p className="dept-duty">{agent.duty}</p>
               <p className="dept-role">
+                <span className="dept-role-name">所屬部門</span>
+                <span>{agentTeam.department}</span>
+              </p>
+              <p className="dept-role">
                 <span className="dept-role-name">負責人</span>
                 <span>{agent.assignee}</span>
               </p>
@@ -290,6 +294,10 @@ export function AiStaffPage() {
                     <p className="dept-step-name">{agent.name}</p>
                     <p className="dept-step-reason">{agent.type}</p>
                     <p className="dept-step-text">{agent.duty}</p>
+                    <p className="dept-role">
+                      <span className="dept-role-name">負責人</span>
+                      <span>待指派</span>
+                    </p>
                   </div>
                 ))}
               </div>
