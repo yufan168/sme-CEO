@@ -916,3 +916,33 @@ body {
 .card-group[id^='flow-'] {
   scroll-margin-top: 16px;
 }
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .metric-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.metric-card {
+  padding: 16px;
+  border-top: 3px solid var(--brand-gold);
+}
+
+.metric-label {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.metric-value {
+  margin: 4px 0 0;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--brand-brown);
+}

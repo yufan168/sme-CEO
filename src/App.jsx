@@ -10,18 +10,24 @@ import {
   PendingPage,
   ReviewCenterPage,
 } from './sections.jsx'
+import {
+  WarRoomPage,
+  KnowledgePage,
+  PermissionPage,
+  AutomationPage,
+} from './pages2.jsx'
 
 const pages = [
   { id: 'home', label: '公司首頁', ready: true, render: HomePage },
-  { id: 'war-room', label: 'CEO 戰情室', ready: false },
+  { id: 'war-room', label: 'CEO 戰情室', ready: true, render: WarRoomPage },
   { id: 'organization', label: '組織圖', ready: true, render: OrgPage },
   { id: 'departments', label: '部門', ready: true, render: DepartmentsPage },
   { id: 'ai-staff', label: 'AI 員工', ready: true, render: AiStaffPage },
   { id: 'workflow', label: '工作流程', ready: true, render: WorkflowPage },
-  { id: 'knowledge', label: '知識庫', ready: false },
+  { id: 'knowledge', label: '知識庫', ready: true, render: KnowledgePage },
   { id: 'review', label: '審核中心', ready: true, render: ReviewCenterPage },
-  { id: 'permission', label: '權限', ready: false },
-  { id: 'automation', label: '自動化', ready: false },
+  { id: 'permission', label: '權限', ready: true, render: PermissionPage },
+  { id: 'automation', label: '自動化', ready: true, render: AutomationPage },
   { id: 'ai-settings', label: 'AI 設定', ready: true, render: AiSettingsPage, group: 'settings' },
 ]
 
