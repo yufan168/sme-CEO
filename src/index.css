@@ -1,9 +1,28 @@
 :root {
-  --text: #222222;
-  --text-muted: #888888;
-  --border: #cccccc;
-  --bg: #ffffff;
-  --surface: #f7f7f8;
+  /* 享洺品牌核心色 */
+  --brand-brown: #372c27;
+  --brand-brown-deep: #261e1a;
+  --brand-brown-mid: #5a4940;
+  --brand-yellow: #feda0d;
+  --brand-gold: #f7b729;
+  --brand-gold-hover: #e9a915;
+  --brand-gold-soft: #fff4c2;
+
+  /* 版面中性色 */
+  --ink: #2d2724;
+  --muted: #756b65;
+  --paper: #ffffff;
+  --warm-white: #f9f9f7;
+  --cream: #f5f1ea;
+  --line: #e5ddd4;
+  --line-soft: #eee8e1;
+
+  /* 既有變數沿用同名，只替換值 */
+  --text: var(--ink);
+  --text-muted: var(--muted);
+  --border: var(--line);
+  --bg: var(--paper);
+  --surface: var(--cream);
 
   font-family: system-ui, 'Segoe UI', Roboto, 'Noto Sans TC', sans-serif;
   font-size: 16px;
@@ -488,4 +507,101 @@ body {
   .page-content {
     padding: 24px;
   }
+}
+
+/* 享洺品牌配色個別調整 */
+
+.sidebar {
+  background-color: var(--brand-brown);
+  border-color: var(--brand-brown-deep);
+}
+
+.sidebar-item {
+  color: var(--warm-white);
+}
+
+.sidebar-item:hover {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+
+.sidebar-item.is-active {
+  background-color: var(--brand-gold);
+  border-color: var(--brand-gold);
+  color: var(--brand-brown);
+  font-weight: 700;
+}
+
+.sidebar-item.is-pending .sidebar-label {
+  color: #897c75;
+}
+
+.sidebar-tag {
+  padding: 1px 6px;
+  color: #b7aaa2;
+  background-color: rgba(255, 255, 255, 0.07);
+  border-radius: 3px;
+}
+
+.sidebar-motto {
+  color: #cfc4bc;
+}
+
+.topbar {
+  background-color: var(--cream);
+}
+
+.topbar-title,
+.card-title,
+.group-title,
+.company-name,
+.dept-name {
+  color: var(--brand-brown);
+}
+
+.card {
+  border-radius: 12px;
+}
+
+.enter-button {
+  color: var(--brand-brown);
+  font-weight: 600;
+  background-color: var(--brand-gold);
+  border-color: var(--brand-gold);
+}
+
+.enter-button:hover {
+  background-color: var(--brand-gold-hover);
+  border-color: var(--brand-gold-hover);
+}
+
+.sidebar-item:focus-visible,
+.enter-button:focus-visible {
+  outline: 2px solid var(--brand-gold);
+  outline-offset: 2px;
+}
+
+.org-root {
+  color: var(--warm-white);
+  background-color: var(--brand-brown);
+  border-color: var(--brand-brown);
+}
+
+.org-child .org-node {
+  background-color: var(--paper);
+  border-color: var(--brand-brown-mid);
+}
+
+.legend-start {
+  background-color: #f2eeea;
+  border-color: #a99b92;
+}
+
+.legend-agent {
+  background-color: var(--brand-gold-soft);
+  border-color: var(--brand-gold);
+}
+
+.legend-human {
+  background-color: var(--brand-brown);
+  border-color: var(--brand-brown);
 }

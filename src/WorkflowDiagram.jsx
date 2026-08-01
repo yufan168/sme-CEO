@@ -16,9 +16,9 @@ const definition = `flowchart LR
   approve["主管審核"]
   send["送出"]
   incoming --> classify --> lookup --> draft --> approve --> send
-  classDef startNode fill:#f3f4f6,stroke:#9ca3af,color:#374151;
-  classDef agentNode fill:#e8f1ff,stroke:#4f7fc7,color:#173b68;
-  classDef humanNode fill:#fff0e5,stroke:#c56a2d,color:#6b3415;
+  classDef startNode fill:#F2EEEA,stroke:#A99B92,color:#5A4940;
+  classDef agentNode fill:#FFF4C2,stroke:#F7B729,color:#5C4219;
+  classDef humanNode fill:#372C27,stroke:#372C27,color:#FFFFFF;
   class incoming startNode;
   class classify,lookup,draft agentNode;
   class approve,send humanNode;`
