@@ -81,13 +81,13 @@ export function HomePage({ onNavigate }) {
   )
 }
 
-export function OrgPage() {
+export function OrgPage({ onNavigate }) {
   return (
     <section className="card">
       <h2 className="card-title">組織架構</h2>
       <p className="group-note">
-        公司之下為六個部門，各部門之下為該部門的 AI Agent。人工控制點不列為節點，
-        由部門與工作流程規格承接。
+        公司之下為七個部門，各部門之下為該部門的 AI Agent。點選部門可直接跳到
+        AI 員工分頁的該部門欄位。人工控制點不列為節點，由部門與工作流程規格承接。
       </p>
       <div className="org-chart">
         <div className="org-node org-root">享洺有限公司</div>
@@ -95,7 +95,13 @@ export function OrgPage() {
         <ul className="org-children">
           {blueprint.map((dept) => (
             <li className="org-child" key={dept.department}>
-              <div className="org-node org-dept">{dept.department}</div>
+              <button
+                type="button"
+                className="org-node org-dept org-dept-link"
+                onClick={() => onNavigate('ai-staff', 'dept-' + dept.department)}
+              >
+                {dept.department}
+              </button>
               <ul className="org-grandchildren">
                 {dept.agents.map((agent) => (
                   <li className="org-grandchild" key={agent.id}>
@@ -283,7 +289,11 @@ function BlueprintSection() {
       </section>
 
       {blueprint.map((dept) => (
-        <section className="card-group" key={dept.department}>
+        <section
+          className="card-group"
+          key={dept.department}
+          id={'dept-' + dept.department}
+        >
           <h2 className="group-title">{dept.department}</h2>
           {dept.note && <p className="group-note">{dept.note}</p>}
 

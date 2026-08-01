@@ -865,3 +865,29 @@ body {
   color: var(--brand-brown);
   font-weight: 600;
 }
+
+.org-dept-link {
+  display: block;
+  width: 100%;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--brand-brown);
+  text-align: center;
+  background-color: var(--paper);
+  cursor: pointer;
+}
+
+.org-dept-link:hover {
+  background-color: var(--brand-gold-soft);
+  border-color: var(--brand-gold);
+}
+
+.org-dept-link:focus-visible {
+  outline: 2px solid var(--brand-gold);
+  outline-offset: 2px;
+}
+
+.card-group[id^='dept-'] {
+  scroll-margin-top: 16px;
+}

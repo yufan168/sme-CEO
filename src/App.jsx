@@ -27,15 +27,28 @@ const pages = [
 function App() {
   const [activeId, setActiveId] = useState('home')
   const contentRef = useRef(null)
+  const [anchor, setAnchor] = useState(null)
   const [engineReady, setEngineReady] = useState(hasApiKey())
   const refreshEngine = useCallback(() => setEngineReady(hasApiKey()), [])
   const active = pages.find((page) => page.id === activeId)
   const Content = active.render ?? PendingPage
 
+  const navigate = useCallback((id, target = null) => {
+    setActiveId(id)
+    setAnchor(target)
+  }, [])
+
   useEffect(() => {
+    if (anchor) {
+      const el = document.getElementById(anchor)
+      if (el) {
+        el.scrollIntoView({ block: 'start' })
+        return
+      }
+    }
     contentRef.current?.scrollTo(0, 0)
     window.scrollTo(0, 0)
-  }, [activeId])
+  }, [activeId, anchor])
 
   return (
     <div className="workspace">
@@ -57,7 +70,7 @@ function App() {
                 (page.id === activeId ? ' is-active' : '') +
                 (page.ready ? '' : ' is-pending')
               }
-              onClick={() => setActiveId(page.id)}
+              onClick={() => navigate(page.id)}
             >
               <span className="sidebar-label">{page.label}</span>
               {!page.ready && <span className="sidebar-tag">待建</span>}
@@ -75,7 +88,7 @@ function App() {
           <h1 className="topbar-title">{active.label}</h1>
         </header>
         <main className="page-content" ref={contentRef}>
-          <Content onNavigate={setActiveId} onEngineChange={refreshEngine} />
+          <Content onNavigate={navigate} onEngineChange={refreshEngine} />
         </main>
       </div>
     </div>
