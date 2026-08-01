@@ -7,6 +7,7 @@ import {
 } from './agentBlueprint.js'
 import { authority, authorityNote } from './authority.js'
 import { businessLines, caseLifecycle, channels } from './businessLines.js'
+import { programNote, programs } from './programs.js'
 import { workflows } from './workflows.js'
 import { hasApiKey } from './aiSettings.js'
 import { listWaiting, subscribe } from './runStore.js'
@@ -238,6 +239,49 @@ function buildEntries() {
       extra: '歸屬：' + ch.dept,
     })
   })
+  programs.forEach((program) => {
+    entries.push({
+      id: 'program-' + program.id,
+      title: program.code + '　' + program.name,
+      kind: '政府計畫',
+      body: program.background,
+      extra: `主管機關：${program.authority}｜適用對象：${program.target}`,
+    })
+    program.stages.forEach((stage) => {
+      entries.push({
+        id: 'program-' + program.id + '-' + stage.code,
+        title: `${program.name}　${stage.code} ${stage.name}`,
+        kind: '政府計畫階段',
+        body: stage.summary + '　' + stage.money.join('；'),
+        extra: stage.note,
+      })
+    })
+    entries.push({
+      id: 'program-' + program.id + '-eligibility',
+      title: program.name + '　申請資格',
+      kind: '政府計畫資格',
+      body: program.eligibility.join('；'),
+      extra: '不得申請：' + program.excluded.join('；'),
+    })
+    if (program.ratioChecks.length) {
+      entries.push({
+        id: 'program-' + program.id + '-ratio',
+        title: program.name + '　經費比例上限',
+        kind: '政府計畫核銷',
+        body: program.ratioChecks
+          .map((row) => `${row.item} 不得超過${row.base}之 ${row.limit}%`)
+          .join('；'),
+        extra: program.accounting.join('；'),
+      })
+    }
+    entries.push({
+      id: 'program-' + program.id + '-deadline',
+      title: program.name + '　期限與罰則',
+      kind: '政府計畫期限',
+      body: program.deadlines.map((row) => `${row.item}：${row.rule}`).join('；'),
+      extra: '罰則：' + program.penalty,
+    })
+  })
   return entries
 }
 
@@ -256,9 +300,11 @@ export function KnowledgePage({ onNavigate }) {
       <section className="card">
         <h2 className="card-title">知識庫</h2>
         <p className="group-note">
-          目前收錄的是系統本身的設定：部門流程、Agent 職責與邊界、工作流程的關鍵控制條件、
-          業務線與接觸管道。外部文件、教材與計畫 know-how 需要接上儲存來源才能收錄，本版尚未接入。
+          收錄系統本身的設定：部門流程、Agent 職責與邊界、工作流程的關鍵控制條件、
+          業務線與接觸管道，以及政府計畫的資格、金額、經費比例、期限與罰則。
+          外部文件、教材與計畫 know-how 需要接上儲存來源才能收錄，本版尚未接入。
         </p>
+        <p className="dept-step-reason">{programNote}</p>
         <div className="field">
           <label className="field-label" htmlFor="kb-search">
             搜尋

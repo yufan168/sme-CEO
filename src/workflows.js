@@ -925,6 +925,7 @@ export const workflows = [
         id: "eligible",
         name: "比對計畫資格",
         executor: "agent",
+        knowledge: ["icg-mfg", "icg-svc"],
         agentId: "G01",
         agentName: "計畫資格比對員",
         instruction: "比對企業條件與計畫規定，結果一律標示為初步比對，不得宣稱必然通過。",
@@ -959,6 +960,7 @@ export const workflows = [
         id: "proposal",
         name: "草擬計畫書",
         executor: "agent",
+        knowledge: ["icg-mfg", "icg-svc"],
         agentId: "G02",
         agentName: "計畫書草擬員",
         instruction: "依計畫規定與企業資料草擬章節與經費表初稿，未確認數字一律留白。",
@@ -1005,6 +1007,7 @@ export const workflows = [
         id: "monitor",
         name: "監測期限與查核事項",
         executor: "agent",
+        knowledge: ["icg-mfg", "icg-svc"],
         agentId: "G03",
         agentName: "查核與期限監測員",
         instruction: "追蹤送件、執行、查核與核銷的重要期限，只提醒不代辦。",
@@ -1039,6 +1042,7 @@ export const workflows = [
         id: "check",
         name: "檢查核銷文件",
         executor: "agent",
+        knowledge: ["icg-mfg", "icg-svc"],
         agentId: "G04",
         agentName: "核銷文件檢查員",
         instruction: "檢查欄位、附件與一致性，只指出缺漏，不核准也不修改憑證。",
@@ -1643,4 +1647,423 @@ export const workflows = [
       }
     ]
   },
+  {
+    "id": "wf-i01",
+    "code": "WF-I01",
+    "name": "ISO 改版導入流程",
+    "department": "制度與認證輔導部",
+    "shape": "Chain 為主，Branch 出現在負責人審核：文件需調整回 I02，差距判斷有疑義回 I01。",
+    "goal": "把標準改版要求轉成可運行的文件與流程，並完成查證前的準備。",
+    "exec": [
+      {
+        "id": "start",
+        "name": "開始",
+        "executor": "system",
+        "systemType": "start",
+        "next": "intake"
+      },
+      {
+        "id": "intake",
+        "name": "提供現行文件與標準版本",
+        "executor": "human",
+        "gateType": "input",
+        "waitingMessage": "等待人提供客戶現行文件清單與適用標準版本",
+        "next": "gap"
+      },
+      {
+        "id": "gap",
+        "name": "比對條文差距",
+        "executor": "agent",
+        "agentId": "I01",
+        "agentName": "條文差距比對員",
+        "instruction": "逐條比對新舊版標準與現行文件，列出差距、受影響文件與風險初判，不判定是否符合標準。",
+        "readsFrom": [],
+        "outputContract": [
+          "標準與版本",
+          "逐條差距",
+          "受影響文件",
+          "風險等級初判",
+          "需人確認事項"
+        ],
+        "demoOutput": {
+          "summary": "比對示範客戶的現行文件與新版標準。",
+          "basis": [
+            "示範文件清單"
+          ],
+          "result": "【標準與版本】\nISO9001，現行文件為 2015 版架構。\n\n【逐條差距】\n風險與機會的鑑別未留下紀錄；變更管理缺少審查證據；供應商評鑑準則未文件化。\n\n【受影響文件】\n品質手冊、採購程序書、變更管理程序書共 3 份。\n\n【風險等級初判】\n變更管理為高，其餘為中。\n\n【需人確認事項】\n客戶是否已有未文件化的既有做法可直接轉為紀錄。"
+        },
+        "next": "draft"
+      },
+      {
+        "id": "draft",
+        "name": "草擬文件與流程調整",
+        "executor": "agent",
+        "agentId": "I02",
+        "agentName": "文件精簡與流程草擬員",
+        "instruction": "依差距結果草擬程序書與表單調整建議，標出可合併或刪除的冗餘文件，不得直接刪除客戶文件。",
+        "readsFrom": [
+          "gap"
+        ],
+        "outputContract": [
+          "建議保留文件",
+          "建議合併文件",
+          "建議刪除文件",
+          "流程調整草案",
+          "需人決定事項"
+        ],
+        "demoOutput": {
+          "summary": "依差距草擬文件調整方案。",
+          "basis": [
+            "條文差距比對員的產出"
+          ],
+          "result": "【建議保留文件】\n品質手冊、採購程序書。\n\n【建議合併文件】\n三份表單合併為一份變更申請單。\n\n【建議刪除文件】\n兩份無人填寫且無條文要求的月報表，需人確認後才可刪。\n\n【流程調整草案】\n變更管理加入審查與核准兩個必要欄位。\n\n【需人決定事項】\n權責分工由誰核准變更。"
+        },
+        "next": "review"
+      },
+      {
+        "id": "review",
+        "name": "負責人審核文件草案",
+        "executor": "human",
+        "gateType": "review",
+        "waitingMessage": "等待負責人審核文件與流程草案",
+        "rejectTo": "draft",
+        "next": "teach"
+      },
+      {
+        "id": "teach",
+        "name": "編寫內稽教材",
+        "executor": "agent",
+        "agentId": "I03",
+        "agentName": "內稽教材與題庫草擬員",
+        "instruction": "依調整後的文件草擬內部稽核員訓練教材、模擬情境與查檢表題庫。",
+        "readsFrom": [
+          "draft"
+        ],
+        "outputContract": [
+          "教材大綱",
+          "模擬稽核情境",
+          "查檢表題庫",
+          "時間分配",
+          "待補內容"
+        ],
+        "demoOutput": {
+          "summary": "產出內稽訓練教材初稿。",
+          "basis": [
+            "文件精簡與流程草擬員的產出"
+          ],
+          "result": "【教材大綱】\n稽核概念、稽核計畫、現場技巧、報告撰寫共四單元。\n\n【模擬稽核情境】\n變更管理未留審查紀錄的情境一則。\n\n【查檢表題庫】\n對應三份受影響文件共 18 題。\n\n【時間分配】\n合計 6 小時。\n\n【待補內容】\n客戶實際發生過的不符合案例。"
+        },
+        "next": "precheck"
+      },
+      {
+        "id": "precheck",
+        "name": "檢查查證準備",
+        "executor": "agent",
+        "agentId": "I04",
+        "agentName": "查證準備檢查員",
+        "instruction": "檢查查證前的文件、紀錄與矯正措施是否齊全，只指出缺漏，不預告查證結果。",
+        "readsFrom": [
+          "draft",
+          "teach"
+        ],
+        "outputContract": [
+          "檢查日期",
+          "齊全項目",
+          "缺漏項目",
+          "不一致項目",
+          "需人確認事項"
+        ],
+        "demoOutput": {
+          "summary": "查證前的完整性檢查。",
+          "basis": [
+            "文件草案",
+            "內稽教材"
+          ],
+          "result": "【檢查日期】\n示範日期\n\n【齊全項目】\n品質手冊、採購程序書皆為現行版。\n\n【缺漏項目】\n管理審查紀錄僅有一次，未涵蓋完整週期。\n\n【不一致項目】\n變更管理程序書版次與表單版次不一致。\n\n【需人確認事項】\n是否補辦一次管理審查。"
+        },
+        "next": "sign"
+      },
+      {
+        "id": "sign",
+        "name": "簽署發行與面對查證",
+        "executor": "human",
+        "gateType": "send",
+        "waitingMessage": "等待負責人簽署文件版次並面對外部查證",
+        "next": "finish"
+      },
+      {
+        "id": "finish",
+        "name": "流程完成",
+        "executor": "system",
+        "systemType": "end"
+      }
+    ],
+    "definition": "flowchart LR\n  start([\"開始\"])\n  intake[\"提供現行文件與標準版本\"]\n  gap[\"比對條文差距\"]\n  draft[\"草擬文件與流程調整\"]\n  review{\"負責人審核文件草案\"}\n  teach[\"編寫內稽教材\"]\n  precheck[\"檢查查證準備\"]\n  sign[\"簽署發行與面對查證\"]\n  finish([\"流程完成\"])\n  start --> intake\n  intake --> gap\n  gap --> draft\n  draft --> review\n  review -->|核准| teach\n  review -->|退回修改| draft\n  teach --> precheck\n  precheck --> sign\n  sign --> finish\n  classDef systemNode fill:#F2EEEA,stroke:#A99B92,color:#5A4940;\n  classDef agentNode fill:#FFF4C2,stroke:#F7B729,color:#5C4219;\n  classDef humanNode fill:#372C27,stroke:#372C27,color:#FFFFFF;\n  classDef decisionNode fill:#372C27,stroke:#F7B729,color:#FFFFFF,stroke-width:3px;\n  class start,finish systemNode;\n  class gap,draft,teach,precheck agentNode;\n  class intake,sign humanNode;\n  class review decisionNode;",
+    "nodes": [
+      {
+        "id": "－",
+        "work": "開始",
+        "owner": "系統起點",
+        "kind": "system"
+      },
+      {
+        "id": "A",
+        "work": "提供現行文件與標準版本",
+        "owner": "人",
+        "kind": "human"
+      },
+      {
+        "id": "B",
+        "work": "比對條文差距",
+        "owner": "Agent：條文差距比對員（I01）",
+        "kind": "agent"
+      },
+      {
+        "id": "C",
+        "work": "草擬文件與流程調整",
+        "owner": "Agent：文件精簡與流程草擬員（I02）",
+        "kind": "agent"
+      },
+      {
+        "id": "D",
+        "work": "負責人審核文件草案",
+        "owner": "人（判斷節點）",
+        "kind": "decision"
+      },
+      {
+        "id": "E",
+        "work": "編寫內稽教材",
+        "owner": "Agent：內稽教材與題庫草擬員（I03）",
+        "kind": "agent"
+      },
+      {
+        "id": "F",
+        "work": "檢查查證準備",
+        "owner": "Agent：查證準備檢查員（I04）",
+        "kind": "agent"
+      },
+      {
+        "id": "G",
+        "work": "簽署發行與面對查證",
+        "owner": "人",
+        "kind": "human"
+      },
+      {
+        "id": "－",
+        "work": "流程完成",
+        "owner": "系統終點",
+        "kind": "system"
+      }
+    ]
+  },
+  {
+    "id": "wf-e01",
+    "code": "WF-E01",
+    "name": "溫室氣體盤查與報告流程",
+    "department": "永續與碳管理部",
+    "shape": "Chain 為主，Branch 出現在負責人確認數據：數據不足回 E02，計算有疑點回 E03。",
+    "goal": "從盤查邊界到報告書架構完成資料整理與檢查，數據真實性與對外揭露由人負責。",
+    "exec": [
+      {
+        "id": "start",
+        "name": "開始",
+        "executor": "system",
+        "systemType": "start",
+        "next": "scopeIn"
+      },
+      {
+        "id": "scopeIn",
+        "name": "提供組織資料與盤查目的",
+        "executor": "human",
+        "gateType": "input",
+        "waitingMessage": "等待人提供組織範圍、據點清單與適用準則",
+        "next": "boundary"
+      },
+      {
+        "id": "boundary",
+        "name": "整理盤查邊界與範疇",
+        "executor": "agent",
+        "agentId": "E01",
+        "agentName": "盤查邊界與範疇整理員",
+        "instruction": "整理組織邊界、營運邊界與範疇一二三的涵蓋項目，尚未界定者一律標出，不代為決定邊界。",
+        "readsFrom": [],
+        "outputContract": [
+          "組織邊界",
+          "營運邊界",
+          "範疇一項目",
+          "範疇二項目",
+          "範疇三項目",
+          "尚未界定"
+        ],
+        "demoOutput": {
+          "summary": "整理示範組織的盤查邊界。",
+          "basis": [
+            "示範據點清單"
+          ],
+          "result": "【組織邊界】\n採營運控制權法，涵蓋總公司與一處廠區。\n\n【營運邊界】\n固定燃燒、外購電力、員工通勤。\n\n【範疇一項目】\n鍋爐天然氣、公務車汽油、冷媒逸散。\n\n【範疇二項目】\n外購電力。\n\n【範疇三項目】\n員工通勤、商務旅運，其餘尚未納入。\n\n【尚未界定】\n租賃倉庫是否納入營運控制權範圍。"
+        },
+        "next": "datalist"
+      },
+      {
+        "id": "datalist",
+        "name": "草擬活動數據清單",
+        "executor": "agent",
+        "agentId": "E02",
+        "agentName": "活動數據清單草擬員",
+        "instruction": "依邊界產出應蒐集的活動數據清單、資料來源與負責單位建議，缺漏留白不得代填。",
+        "readsFrom": [
+          "boundary"
+        ],
+        "outputContract": [
+          "應蒐集數據",
+          "資料來源",
+          "建議負責單位",
+          "蒐集期間",
+          "目前缺漏"
+        ],
+        "demoOutput": {
+          "summary": "列出應蒐集的活動數據。",
+          "basis": [
+            "盤查邊界與範疇整理員的產出"
+          ],
+          "result": "【應蒐集數據】\n天然氣用量、汽油加油紀錄、冷媒補充量、電費單、通勤問卷。\n\n【資料來源】\n瓦斯帳單、加油卡月報、設備維修單、台電帳單、人資調查。\n\n【建議負責單位】\n總務、車輛管理、設備、財務、人資。\n\n【蒐集期間】\n完整一個曆年。\n\n【目前缺漏】\n冷媒補充量無紀錄，需向維修廠商調閱。"
+        },
+        "next": "calc"
+      },
+      {
+        "id": "calc",
+        "name": "檢查排放量試算",
+        "executor": "agent",
+        "agentId": "E03",
+        "agentName": "排放量試算檢查員",
+        "instruction": "檢查單位、係數版本、加總一致性與異常值，只指出疑點，不出具排放量結論。",
+        "readsFrom": [
+          "datalist"
+        ],
+        "outputContract": [
+          "檢查日期",
+          "單位與係數檢查",
+          "加總一致性",
+          "異常值",
+          "需人確認事項"
+        ],
+        "demoOutput": {
+          "summary": "檢查試算結果的一致性。",
+          "basis": [
+            "活動數據清單草擬員的產出"
+          ],
+          "result": "【檢查日期】\n示範日期\n\n【單位與係數檢查】\n電力係數未標註年度版本。\n\n【加總一致性】\n三個範疇加總與總量相符。\n\n【異常值】\n第三季天然氣用量為其他季的 3.2 倍。\n\n【需人確認事項】\n第三季是否有特殊生產活動；電力係數採用哪一年度公告值。"
+        },
+        "next": "confirm"
+      },
+      {
+        "id": "confirm",
+        "name": "負責人確認數據與係數",
+        "executor": "human",
+        "gateType": "review",
+        "waitingMessage": "等待負責人確認活動數據真實性與係數選用",
+        "rejectTo": "datalist",
+        "next": "report"
+      },
+      {
+        "id": "report",
+        "name": "草擬報告書架構",
+        "executor": "agent",
+        "agentId": "E04",
+        "agentName": "報告書與揭露架構草擬員",
+        "instruction": "依適用準則草擬章節架構與揭露項目對照表，不得撰寫減碳承諾。",
+        "readsFrom": [
+          "boundary",
+          "calc"
+        ],
+        "outputContract": [
+          "適用準則",
+          "章節架構",
+          "揭露項目對照",
+          "待補內容",
+          "需人決定事項"
+        ],
+        "demoOutput": {
+          "summary": "草擬報告書架構。",
+          "basis": [
+            "盤查邊界",
+            "試算檢查結果"
+          ],
+          "result": "【適用準則】\nISO 14064-1:2018。\n\n【章節架構】\n組織描述、邊界、量化方法、排放量、不確定性、改善機會共六章。\n\n【揭露項目對照】\n逐條對應準則要求，目前 4 項待補。\n\n【待補內容】\n不確定性評估、基準年設定理由。\n\n【需人決定事項】\n是否設定減碳目標並對外揭露，此項不得由 AI 草擬。"
+        },
+        "next": "declare"
+      },
+      {
+        "id": "declare",
+        "name": "簽署聲明與面對查證",
+        "executor": "human",
+        "gateType": "send",
+        "waitingMessage": "等待負責人簽署聲明並面對外部查證",
+        "next": "finish"
+      },
+      {
+        "id": "finish",
+        "name": "流程完成",
+        "executor": "system",
+        "systemType": "end"
+      }
+    ],
+    "definition": "flowchart LR\n  start([\"開始\"])\n  scopeIn[\"提供組織資料與盤查目的\"]\n  boundary[\"整理盤查邊界與範疇\"]\n  datalist[\"草擬活動數據清單\"]\n  calc[\"檢查排放量試算\"]\n  confirm{\"負責人確認數據與係數\"}\n  report[\"草擬報告書架構\"]\n  declare[\"簽署聲明與面對查證\"]\n  finish([\"流程完成\"])\n  start --> scopeIn\n  scopeIn --> boundary\n  boundary --> datalist\n  datalist --> calc\n  calc --> confirm\n  confirm -->|核准| report\n  confirm -->|退回修改| datalist\n  report --> declare\n  declare --> finish\n  classDef systemNode fill:#F2EEEA,stroke:#A99B92,color:#5A4940;\n  classDef agentNode fill:#FFF4C2,stroke:#F7B729,color:#5C4219;\n  classDef humanNode fill:#372C27,stroke:#372C27,color:#FFFFFF;\n  classDef decisionNode fill:#372C27,stroke:#F7B729,color:#FFFFFF,stroke-width:3px;\n  class start,finish systemNode;\n  class boundary,datalist,calc,report agentNode;\n  class scopeIn,declare humanNode;\n  class confirm decisionNode;",
+    "nodes": [
+      {
+        "id": "－",
+        "work": "開始",
+        "owner": "系統起點",
+        "kind": "system"
+      },
+      {
+        "id": "A",
+        "work": "提供組織資料與盤查目的",
+        "owner": "人",
+        "kind": "human"
+      },
+      {
+        "id": "B",
+        "work": "整理盤查邊界與範疇",
+        "owner": "Agent：盤查邊界與範疇整理員（E01）",
+        "kind": "agent"
+      },
+      {
+        "id": "C",
+        "work": "草擬活動數據清單",
+        "owner": "Agent：活動數據清單草擬員（E02）",
+        "kind": "agent"
+      },
+      {
+        "id": "D",
+        "work": "檢查排放量試算",
+        "owner": "Agent：排放量試算檢查員（E03）",
+        "kind": "agent"
+      },
+      {
+        "id": "E",
+        "work": "負責人確認數據與係數",
+        "owner": "人（判斷節點）",
+        "kind": "decision"
+      },
+      {
+        "id": "F",
+        "work": "草擬報告書架構",
+        "owner": "Agent：報告書與揭露架構草擬員（E04）",
+        "kind": "agent"
+      },
+      {
+        "id": "G",
+        "work": "簽署聲明與面對查證",
+        "owner": "人",
+        "kind": "human"
+      },
+      {
+        "id": "－",
+        "work": "流程完成",
+        "owner": "系統終點",
+        "kind": "system"
+      }
+    ]
+  }
 ]
