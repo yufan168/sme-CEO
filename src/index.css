@@ -485,7 +485,6 @@ body {
     top: 0;
     flex: 0 0 200px;
     height: 100vh;
-    justify-content: space-between;
     border-bottom: 0;
     border-right: 1px solid var(--border);
   }
@@ -494,6 +493,10 @@ body {
     flex-direction: column;
     flex-wrap: nowrap;
     gap: 2px;
+  }
+
+  .sidebar-motto {
+    margin-top: auto;
   }
 
   .sidebar-item {
@@ -615,14 +618,9 @@ body {
 }
 
 .sidebar-mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  flex: 0 0 32px;
   width: 32px;
   height: 32px;
-  font-weight: 700;
-  color: var(--brand-brown);
-  background-color: var(--brand-gold);
   border-radius: 6px;
 }
 
@@ -632,6 +630,7 @@ body {
 }
 
 .sidebar-nav {
+  align-content: flex-start;
   overflow-y: auto;
 }
 
@@ -643,6 +642,7 @@ body {
 
 .sidebar-brand-sub {
   font-size: 11px;
+  white-space: nowrap;
   letter-spacing: 0.04em;
   color: #a9998f;
 }
@@ -658,4 +658,18 @@ body {
 
 .node-kind-system {
   color: var(--muted);
+}
+
+.perm-yes,
+.perm-no {
+  flex: 0 0 32px;
+  font-weight: 600;
+}
+
+.perm-yes {
+  color: var(--brand-brown-mid);
+}
+
+.perm-no {
+  color: #a94c3d;
 }

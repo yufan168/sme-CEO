@@ -36,10 +36,10 @@ function App() {
     <div className="workspace">
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <span className="sidebar-mark">洺</span>
+          <img className="sidebar-mark" src="/logo-mark.png" alt="享洺有限公司" width="32" height="32" />
           <span className="sidebar-brand-text">
             <span className="sidebar-brand-name">享洺有限公司</span>
-            <span className="sidebar-brand-sub">XIANG MING · AI WORKSPACE</span>
+            <span className="sidebar-brand-sub">XIANG MING Ltd.</span>
           </span>
         </div>
         <nav className="sidebar-nav">
