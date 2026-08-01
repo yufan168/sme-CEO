@@ -371,7 +371,9 @@ function AgentTeamSection({ team }) {
 
         {team.gates.map((gate) => (
           <article className="card dept-card" key={gate.name}>
-            <h3 className="dept-name">{gate.name}</h3>
+            <h3 className="dept-name">
+              {gate.id}　{gate.name}
+            </h3>
 
             {gate.checks && (
               <div className="dept-block">

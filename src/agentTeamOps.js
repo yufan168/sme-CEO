@@ -139,6 +139,7 @@ export const opsTeam = {
   ],
   gates: [
     {
+      id: 'H01',
       name: '負責人檢視（留人）',
       checkLabel: '負責人需要確認',
       checks: [
@@ -151,6 +152,7 @@ export const opsTeam = {
       rule: '需要綜合考量人力、案件、帳務、活動與突發事件，確認 AI 提供的資訊是否符合實際情況。',
     },
     {
+      id: 'H02',
       name: '決定今日工作安排（留人）',
       checkLabel: '這一步包含管理責任',
       checks: [
@@ -164,6 +166,7 @@ export const opsTeam = {
       rule: 'AI 可以提出建議，但不能直接成為正式工作指令。',
     },
     {
+      id: 'H03',
       name: '通知各部門（留人）',
       checkLabel: 'Agent 不應直接做的事',
       checks: [

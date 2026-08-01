@@ -108,6 +108,7 @@ export const agentTeam = {
   ],
   gates: [
     {
+      id: 'H01',
       name: '主管審核（留人）',
       checkLabel: '主管應至少檢查',
       checks: [
@@ -122,6 +123,7 @@ export const agentTeam = {
       rule: '不另設 Reviewer Agent。主管本身已是正式審核者，多一層 Reviewer 只會增加流程，卻不能取代人的責任判斷。',
     },
     {
+      id: 'H02',
       name: '送出回覆（留人）',
       checkLabel: '人的責任',
       checks: [

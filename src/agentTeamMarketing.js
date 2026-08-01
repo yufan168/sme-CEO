@@ -201,6 +201,7 @@ export const marketingTeam = {
   ],
   gates: [
     {
+      id: 'H01',
       name: '負責人審核（留人）',
       checkLabel: '負責人應確認',
       checks: [
@@ -224,6 +225,7 @@ export const marketingTeam = {
       rule: '正式品牌審核由負責人承擔，不另設 Reviewer Agent。',
     },
     {
+      id: 'H02',
       name: '發布內容（留人）',
       checkLabel: '發布前最後確認',
       checks: [
