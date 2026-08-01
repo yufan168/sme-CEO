@@ -16,6 +16,10 @@ import {
   blueprintNote,
   blueprintOverview,
   blueprintPrinciple,
+  commonAllowed,
+  commonForbidden,
+  commonPermissionNote,
+  governanceChain,
   rolloutNote,
 } from './agentBlueprint.js'
 import WorkflowDiagram from './WorkflowDiagram.jsx'
@@ -322,6 +326,17 @@ function BlueprintSection() {
                   </div>
                 )}
 
+                {agent.output && (
+                  <div className="dept-block">
+                    <h4 className="dept-label">{agent.outputLabel}</h4>
+                    <ul className="dept-list">
+                      {agent.output.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
                 <div className="dept-block">
                   <h4 className="dept-label">工作邊界</h4>
                   <p className="dept-step-text">{agent.limit}</p>
@@ -336,10 +351,44 @@ function BlueprintSection() {
                   <li key={item}>{item}</li>
                 ))}
               </ul>
+              {dept.gateChain && (
+                <div className="dept-block">
+                  <h4 className="dept-label">人工閘門</h4>
+                  <p className="dept-step-text">{dept.gateChain}</p>
+                </div>
+              )}
             </article>
           </div>
         </section>
       ))}
+
+      <section className="card-group">
+        <h2 className="group-title">共通 AI 權限原則</h2>
+        <p className="group-note">{commonPermissionNote}</p>
+        <div className="dept-grid agent-grid">
+          <article className="card dept-card">
+            <h3 className="dept-name">Agent 可以做</h3>
+            <ul className="dept-list">
+              {commonAllowed.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </article>
+          <article className="card dept-card">
+            <h3 className="dept-name">Agent 不可以做</h3>
+            <ul className="dept-list">
+              {commonForbidden.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </article>
+        </div>
+        <article className="card dept-card">
+          <h3 className="dept-name">治理原則</h3>
+          <p className="dept-step-text">{governanceChain}</p>
+          <p className="dept-step-reason">AI 起草 · 人審核 · 人發送</p>
+        </article>
+      </section>
     </>
   )
 }
