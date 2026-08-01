@@ -1,5 +1,7 @@
 import { departments } from './departments.js'
 import { authority, authorityNote } from './authority.js'
+import { businessLines, businessLinesNote } from './businessLines.js'
+import { agentTeam } from './agents.js'
 
 function App() {
   return (
@@ -127,6 +129,107 @@ function App() {
               </div>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="section">
+        <h2 className="section-title">業務線與部門對應</h2>
+        <p className="section-note">{businessLinesNote}</p>
+        <div className="dept-grid">
+          {businessLines.map((line) => (
+            <article className="dept-card" key={line.name}>
+              <h3 className="dept-name">{line.name}</h3>
+              <div className="dept-block">
+                {line.rows.map((row) => (
+                  <div className="dept-step" key={row.dept}>
+                    <p className="dept-step-name">{row.dept}</p>
+                    <p className="dept-step-text">{row.work}</p>
+                  </div>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="section">
+        <h2 className="section-title">
+          Agent 配置：{agentTeam.department}
+        </h2>
+        <p className="section-note">{agentTeam.note}</p>
+
+        <div className="dept-card agent-flow-card">
+          <h3 className="dept-name">流程與執行者</h3>
+          <div className="dept-block">
+            {agentTeam.flow.map((item) => (
+              <div className="dept-step" key={item.step}>
+                <p className="dept-step-name">{item.step}</p>
+                <p className="dept-step-text">{item.owner}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="dept-grid agent-grid">
+          {agentTeam.agents.map((agent) => (
+            <article className="dept-card" key={agent.id}>
+              <h3 className="dept-name">
+                {agent.id}　{agent.name}
+              </h3>
+              <p className="agent-type">{agent.type}</p>
+              <p className="dept-duty">{agent.duty}</p>
+
+              <div className="dept-block">
+                <h4 className="dept-label">{agent.scopeLabel}</h4>
+                <ul className="dept-list">
+                  {agent.scope.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="dept-block">
+                <h4 className="dept-label">不能做</h4>
+                <ul className="dept-list">
+                  {agent.limits.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="dept-block">
+                <p className="dept-step-text">{agent.rule}</p>
+              </div>
+            </article>
+          ))}
+
+          {agentTeam.gates.map((gate) => (
+            <article className="dept-card" key={gate.name}>
+              <h3 className="dept-name">{gate.name}</h3>
+              <div className="dept-block">
+                <ul className="dept-list">
+                  {gate.items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className="dept-block">
+                <p className="dept-step-text">{gate.rule}</p>
+              </div>
+            </article>
+          ))}
+
+          <article className="dept-card">
+            <h3 className="dept-name">本階段不配置</h3>
+            <div className="dept-block">
+              {agentTeam.notConfigured.map((item) => (
+                <div className="dept-step" key={item.type}>
+                  <p className="dept-step-name">{item.type}</p>
+                  <p className="dept-step-text">{item.reason}</p>
+                </div>
+              ))}
+            </div>
+          </article>
         </div>
       </section>
     </main>

@@ -280,3 +280,20 @@ body {
   margin: -8px 0 16px;
   color: var(--text-muted);
 }
+
+.dept-step-text {
+  margin: 2px 0 0;
+}
+
+.agent-type {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+}
+
+.agent-flow-card {
+  margin-bottom: 16px;
+}
+
+.agent-grid {
+  margin: 0;
+}
