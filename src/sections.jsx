@@ -25,6 +25,7 @@ import {
   rolloutNote,
 } from './agentBlueprint.js'
 import WorkflowDiagram from './WorkflowDiagram.jsx'
+import { findMock, mockNote, mockSourceNote, mockStats } from './mockData.js'
 import { workflows } from './workflows.js'
 import { useEffect, useState } from 'react'
 import {
@@ -262,6 +263,35 @@ export function DepartmentsPage() {
   )
 }
 
+function MockCases({ agentId }) {
+  const row = findMock(agentId)
+  if (!row) return null
+  return (
+    <div className="dept-block mock-block">
+      <h4 className="dept-label">
+        示範情境　{row.cases.length} 筆
+        {row.source === 'system' && <span className="mock-flag">系統補寫</span>}
+      </h4>
+      {row.cases.map((item) => (
+        <div className="mock-case" key={item.id}>
+          <p className="mock-case-head">
+            <span className="mock-case-id">{item.id}</span>
+            {item.title}
+          </p>
+          <p className="mock-case-line">
+            <span className="mock-case-label">輸入</span>
+            {item.input}
+          </p>
+          <p className="mock-case-line">
+            <span className="mock-case-label">輸出</span>
+            {item.output}
+          </p>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function BlueprintSection({ onNavigate }) {
   return (
     <>
@@ -294,6 +324,13 @@ function BlueprintSection({ onNavigate }) {
           <div className="dept-block">
             <h4 className="dept-label">系統設計共通原則</h4>
             <p className="dept-step-text">{blueprintPrinciple}</p>
+          </div>
+          <div className="dept-block">
+            <h4 className="dept-label">
+              示範資料　{mockStats.agents} 位 Agent 共 {mockStats.cases} 筆
+            </h4>
+            <p className="dept-step-text">{mockNote}</p>
+            <p className="dept-step-reason">{mockSourceNote}</p>
           </div>
           <div className="dept-block">
             <p className="dept-step-reason">{rolloutNote}</p>
@@ -384,6 +421,8 @@ function BlueprintSection({ onNavigate }) {
                   <h4 className="dept-label">工作邊界</h4>
                   <p className="dept-step-text">{agent.limit}</p>
                 </div>
+
+                <MockCases agentId={agent.id} />
               </article>
             ))}
 

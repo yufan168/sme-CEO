@@ -1,5 +1,6 @@
 import { hasApiKey } from './aiSettings.js'
 import { callAI } from './callAI.js'
+import { findMock } from './mockData.js'
 import { buildProgramBrief } from './programs.js'
 
 // 通用執行器：只讀 Workflow 定義，不寫死任何流程順序。
@@ -87,12 +88,32 @@ async function executeAgentNode(workflow, run, node) {
     : ['公司基本資料']
 
   if (!hasApiKey()) {
+    if (node.demoOutput) {
+      return {
+        status: 'completed',
+        mode: 'demo',
+        summary: node.demoOutput.summary,
+        basis: node.demoOutput.basis,
+        output: node.demoOutput.result,
+      }
+    }
+    // 節點未附示範產出時，退回使用該 Agent 的示範資料，流程不中斷。
+    const mock = findMock(node.agentId)
+    if (mock) {
+      return {
+        status: 'completed',
+        mode: 'demo',
+        summary: mock.cases[0].title,
+        basis: ['Agent 示範資料 ' + mock.cases[0].id],
+        output: mock.cases
+          .map((item) => `【${item.id}　${item.title}】\n輸入：${item.input}\n輸出：${item.output}`)
+          .join('\n\n'),
+      }
+    }
     return {
-      status: 'completed',
+      status: 'failed',
       mode: 'demo',
-      summary: node.demoOutput.summary,
-      basis: node.demoOutput.basis,
-      output: node.demoOutput.result,
+      error: `節點 ${node.name} 沒有示範產出，${node.agentId} 也沒有示範資料。`,
     }
   }
 

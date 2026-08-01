@@ -970,3 +970,54 @@ body {
   outline: 2px solid var(--brand-gold);
   outline-offset: 2px;
 }
+
+.mock-block {
+  border-top: 1px solid var(--line-soft);
+  padding-top: 12px;
+}
+
+.mock-flag {
+  margin-left: 8px;
+  padding: 1px 6px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.mock-case {
+  padding: 8px 10px;
+  border-left: 3px solid var(--brand-gold-soft);
+  background: var(--warm-white);
+}
+
+.mock-case + .mock-case {
+  margin-top: 8px;
+}
+
+.mock-case-head {
+  margin: 0;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.mock-case-id {
+  display: inline-block;
+  margin-right: 8px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.mock-case-line {
+  margin: 4px 0 0;
+  font-size: 14px;
+}
+
+.mock-case-label {
+  display: inline-block;
+  min-width: 34px;
+  margin-right: 6px;
+  color: var(--text-muted);
+}

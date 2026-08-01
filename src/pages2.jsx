@@ -7,6 +7,7 @@ import {
 } from './agentBlueprint.js'
 import { authority, authorityNote } from './authority.js'
 import { businessLines, caseLifecycle, channels } from './businessLines.js'
+import { mockData, mockStats } from './mockData.js'
 import { programNote, programs } from './programs.js'
 import { workflows } from './workflows.js'
 import { hasApiKey } from './aiSettings.js'
@@ -71,6 +72,11 @@ export function WarRoomPage({ onNavigate }) {
       label: 'AI 引擎',
       value: connected ? '已接' : '未接',
       note: connected ? '執行時呼叫真實模型' : '執行時使用示範內容',
+    },
+    {
+      label: '示範資料',
+      value: String(mockStats.cases),
+      note: `涵蓋 ${mockStats.agents} 位 Agent`,
     },
   ]
 
@@ -280,6 +286,20 @@ function buildEntries() {
       kind: '政府計畫期限',
       body: program.deadlines.map((row) => `${row.item}：${row.rule}`).join('；'),
       extra: '罰則：' + program.penalty,
+    })
+  })
+  mockData.forEach((row) => {
+    row.cases.forEach((item) => {
+      entries.push({
+        id: 'mock-' + item.id,
+        title: `${item.id}　${item.title}`,
+        kind: `示範情境｜${row.agentId} ${row.agentName}`,
+        body: '輸入：' + item.input,
+        extra: '輸出：' + item.output,
+        page: 'ai-staff',
+        anchor: 'agent-' + row.agentId,
+        jump: '前往 Agent',
+      })
     })
   })
   return entries
