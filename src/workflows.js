@@ -141,7 +141,7 @@ export const workflows = [
       { id: 'finish', name: '結束', executor: 'system', systemType: 'end' },
     ],
     name: '文件與素材管理流程',
-    department: '研究與知識管理部',
+    department: '知識與教材管理部',
     shape: 'Chain（一條龍）。Branch 與 Parallel 暫不使用。核心治理原則：AI 分析與建議，人決策與交易。',
     definition: `flowchart LR
   start(["開始"])
@@ -352,7 +352,7 @@ export const workflows = [
       { id: 'finish', name: '結束', executor: 'system', systemType: 'end' },
     ],
     name: '品牌內容企劃與發布流程',
-    department: '客戶開發與關係管理部',
+    department: '客戶開發與行銷部',
     focus: '行銷與品牌經營',
     shape: 'Chain 為主，必要的 Branch 出現在負責人審核：核准往發布，退回修改則附上意見回到內容撰寫，形成修改迴圈。Parallel 不使用。核心原則：AI 起草、人審核、人發布。',
     definition: `flowchart LR

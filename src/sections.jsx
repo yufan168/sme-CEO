@@ -1,6 +1,13 @@
 import { departments } from './departments.js'
 import { authority, authorityNote } from './authority.js'
-import { businessLines, businessLinesNote } from './businessLines.js'
+import {
+  businessLines,
+  businessLinesNote,
+  caseLifecycle,
+  caseLifecycleNote,
+  channelNote,
+  channels,
+} from './businessLines.js'
 import { agentTeam } from './agents.js'
 import { opsTeam } from './agentTeamOps.js'
 import { marketingTeam } from './agentTeamMarketing.js'
@@ -188,6 +195,7 @@ export function DepartmentsPage() {
           {businessLines.map((line) => (
             <article className="card dept-card" key={line.name}>
               <h3 className="dept-name">{line.name}</h3>
+              {line.note && <p className="dept-step-reason">{line.note}</p>}
               <div className="dept-block">
                 {line.rows.map((row) => (
                   <div className="dept-step" key={row.dept}>
@@ -199,6 +207,38 @@ export function DepartmentsPage() {
             </article>
           ))}
         </div>
+      </section>
+
+      <section className="card-group">
+        <h2 className="group-title">案件生命週期</h2>
+        <p className="group-note">{caseLifecycleNote}</p>
+        <article className="card dept-card">
+          <div className="dept-block">
+            {caseLifecycle.map((row) => (
+              <div className="dept-step" key={row.stage}>
+                <p className="dept-step-name">{row.stage}</p>
+                <p className="dept-step-text">{row.dept}</p>
+                <p className="dept-step-reason">留人：{row.human}</p>
+              </div>
+            ))}
+          </div>
+        </article>
+      </section>
+
+      <section className="card-group">
+        <h2 className="group-title">對外接觸管道</h2>
+        <p className="group-note">{channelNote}</p>
+        <article className="card dept-card">
+          <div className="dept-block">
+            {channels.map((row) => (
+              <div className="dept-step" key={row.name}>
+                <p className="dept-step-name">{row.name}</p>
+                <p className="dept-step-text">{row.dept}</p>
+                <p className="dept-step-reason">{row.use}</p>
+              </div>
+            ))}
+          </div>
+        </article>
       </section>
     </>
   )
