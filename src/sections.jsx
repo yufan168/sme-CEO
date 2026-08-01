@@ -14,13 +14,17 @@ import {
 import WorkflowDiagram from './WorkflowDiagram.jsx'
 import { workflows } from './workflows.js'
 
-export function HomePage() {
+export function HomePage({ onNavigate }) {
   return (
     <>
       <section className="card card-home">
         <h1 className="company-name">享洺有限公司</h1>
         <p className="tagline">運用 AI 協助企業提升管理效率</p>
-        <button type="button" className="enter-button">
+        <button
+          type="button"
+          className="enter-button"
+          onClick={() => onNavigate('organization')}
+        >
           進入公司
         </button>
       </section>

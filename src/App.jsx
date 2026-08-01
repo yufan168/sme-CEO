@@ -67,7 +67,7 @@ function App() {
           <h1 className="topbar-title">{active.label}</h1>
         </header>
         <main className="page-content" ref={contentRef}>
-          <Content />
+          <Content onNavigate={setActiveId} />
         </main>
       </div>
     </div>
