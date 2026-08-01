@@ -285,8 +285,10 @@ function BlueprintSection({ onNavigate }) {
               </div>
             ))}
             <div className="dept-step">
-              <p className="dept-step-name">合計　19 個 Agent</p>
-              <p className="dept-step-reason">不代表需要 19 個真人</p>
+              <p className="dept-step-name">
+                合計　{blueprint.reduce((total, dept) => total + dept.agents.length, 0)} 個 Agent
+              </p>
+              <p className="dept-step-reason">不代表需要同樣人數的真人</p>
             </div>
           </div>
           <div className="dept-block">
@@ -318,6 +320,21 @@ function BlueprintSection({ onNavigate }) {
                 </span>
               ))}
             </p>
+            <div className="dept-block">
+              {workflows
+                .filter((flow) => flow.department === dept.department)
+                .map((flow) => (
+                  <p className="dept-step-reason" key={flow.id}>
+                    <button
+                      type="button"
+                      className="jump-link"
+                      onClick={() => onNavigate('workflow', 'flow-' + flow.id)}
+                    >
+                      前往 {flow.code}　{flow.name}
+                    </button>
+                  </p>
+                ))}
+            </div>
           </article>
 
           <div className="dept-grid agent-grid">
@@ -610,9 +627,35 @@ export function AiStaffPage({ onNavigate }) {
   )
 }
 
-export function WorkflowPage() {
+export function WorkflowPage({ onNavigate }) {
   return (
     <>
+      <section className="card">
+        <h2 className="card-title">流程總覽</h2>
+        <p className="group-note">
+          目前共 {workflows.length} 條流程，涵蓋七個部門。點下方任一條，直接跳到該部門的流程欄位。
+        </p>
+        <div className="dept-block">
+          {workflows.map((flow) => (
+            <div className="dept-step" key={flow.id}>
+              <p className="dept-step-name">
+                <button
+                  type="button"
+                  className="jump-link"
+                  onClick={() => onNavigate('workflow', 'flow-' + flow.id)}
+                >
+                  {flow.code}　{flow.name}
+                </button>
+              </p>
+              <p className="dept-step-reason">
+                {flow.department}
+                {flow.focus && `／${flow.focus}`}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {workflows.map((flow) => (
         <section className="card-group" key={flow.id} id={'flow-' + flow.id}>
           <h2 className="group-title">
@@ -620,6 +663,15 @@ export function WorkflowPage() {
             {flow.focus && `／${flow.focus}`}）
           </h2>
           <p className="group-note">{flow.shape}</p>
+          <p className="dept-step-reason">
+            <button
+              type="button"
+              className="jump-link"
+              onClick={() => onNavigate('ai-staff', 'dept-' + flow.department)}
+            >
+              查看 {flow.department} 的 Agent 配置
+            </button>
+          </p>
 
           <article className="card">
             <WorkflowDiagram flow={flow} />

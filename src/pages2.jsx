@@ -133,7 +133,15 @@ export function WarRoomPage({ onNavigate }) {
                 if (!flow || !node) return null
                 return (
                   <div className="dept-step" key={item.workflowId}>
-                    <p className="dept-step-name">{flow.name}</p>
+                    <p className="dept-step-name">
+                      <button
+                        type="button"
+                        className="jump-link"
+                        onClick={() => onNavigate('workflow', 'flow-' + flow.id)}
+                      >
+                        {flow.name}
+                      </button>
+                    </p>
                     <p className="dept-step-text">
                       停在：{node.name}　{node.waitingMessage}
                     </p>
@@ -183,6 +191,9 @@ function buildEntries() {
       kind: '部門流程',
       body: dept.flow.join(' → '),
       extra: '人工閘門：' + (dept.gateChain ?? ''),
+      page: 'ai-staff',
+      anchor: 'dept-' + dept.department,
+      jump: '前往部門',
     })
     dept.agents.forEach((agent) => {
       entries.push({
@@ -191,16 +202,22 @@ function buildEntries() {
         kind: dept.department,
         body: agent.duty,
         extra: '工作邊界：' + agent.limit,
+        page: 'ai-staff',
+        anchor: 'agent-' + agent.id,
+        jump: '前往 Agent',
       })
     })
   })
   workflows.forEach((flow) => {
     entries.push({
       id: 'flow-' + flow.id,
-      title: flow.name,
+      title: flow.code + '　' + flow.name,
       kind: '工作流程',
       body: flow.goal,
       extra: flow.keyRule ? flow.keyRule.title + '：' + flow.keyRule.text : flow.shape,
+      page: 'workflow',
+      anchor: 'flow-' + flow.id,
+      jump: '前往流程',
     })
   })
   businessLines.forEach((line) => {
@@ -224,7 +241,7 @@ function buildEntries() {
   return entries
 }
 
-export function KnowledgePage() {
+export function KnowledgePage({ onNavigate }) {
   const [query, setQuery] = useState('')
   const entries = useMemo(buildEntries, [])
   const keyword = query.trim()
@@ -268,6 +285,17 @@ export function KnowledgePage() {
               <p className="agent-type">{entry.kind}</p>
               {entry.body && <p className="dept-duty">{entry.body}</p>}
               {entry.extra && <p className="dept-step-reason">{entry.extra}</p>}
+              {entry.page && (
+                <p className="dept-step-reason">
+                  <button
+                    type="button"
+                    className="jump-link"
+                    onClick={() => onNavigate(entry.page, entry.anchor)}
+                  >
+                    {entry.jump}
+                  </button>
+                </p>
+              )}
             </article>
           ))}
         </div>
@@ -281,12 +309,17 @@ export function KnowledgePage() {
   )
 }
 
-export function PermissionPage() {
+export function PermissionPage({ onNavigate }) {
   const humanGates = []
   workflows.forEach((flow) =>
     flow.exec.forEach((node) => {
       if (node.executor === 'human') {
-        humanGates.push({ flow: flow.name, node: node.name, type: node.gateType })
+        humanGates.push({
+          flowId: flow.id,
+          flow: flow.name,
+          node: node.name,
+          type: node.gateType,
+        })
       }
     })
   )
@@ -355,7 +388,15 @@ export function PermissionPage() {
             {humanGates.map((gate) => (
               <div className="dept-step" key={gate.flow + gate.node}>
                 <p className="dept-step-name">{gate.node}</p>
-                <p className="dept-step-text">{gate.flow}</p>
+                <p className="dept-step-text">
+                  <button
+                    type="button"
+                    className="jump-link"
+                    onClick={() => onNavigate('workflow', 'flow-' + gate.flowId)}
+                  >
+                    {gate.flow}
+                  </button>
+                </p>
                 <p className="dept-step-reason">
                   類型：
                   {gate.type === 'send'
@@ -387,7 +428,7 @@ export function AutomationPage({ onNavigate }) {
   const perFlow = workflows.map((flow) => {
     const agent = flow.exec.filter((n) => n.executor === 'agent').length
     const human = flow.exec.filter((n) => n.executor === 'human').length
-    return { name: flow.name, agent, human, total: flow.exec.length }
+    return { id: flow.id, name: flow.name, agent, human, total: flow.exec.length }
   })
 
   return (
@@ -400,8 +441,16 @@ export function AutomationPage({ onNavigate }) {
         <article className="card dept-card">
           <div className="dept-block">
             {perFlow.map((row) => (
-              <div className="dept-step" key={row.name}>
-                <p className="dept-step-name">{row.name}</p>
+              <div className="dept-step" key={row.id}>
+                <p className="dept-step-name">
+                  <button
+                    type="button"
+                    className="jump-link"
+                    onClick={() => onNavigate('workflow', 'flow-' + row.id)}
+                  >
+                    {row.name}
+                  </button>
+                </p>
                 <p className="dept-step-text">
                   Agent 節點 {row.agent}　人工關卡 {row.human}　共 {row.total} 個節點
                 </p>
