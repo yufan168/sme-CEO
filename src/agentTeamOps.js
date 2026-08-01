@@ -14,7 +14,7 @@ export const opsTeam = {
   ],
   agents: [
     {
-      id: '01',
+      id: 'A17',
       name: '營運資訊整理員',
       type: 'Worker 執行員',
       duty: '彙整今日案件進度、工時、應收付款與行程等營運資訊。',
@@ -22,7 +22,7 @@ export const opsTeam = {
       step: '彙整今日營運資訊',
     },
     {
-      id: '02',
+      id: 'A18',
       name: '待辦整理員',
       type: 'Worker 執行員',
       duty: '整理今日待辦事項並依優先順序列出工作清單。',
@@ -30,7 +30,7 @@ export const opsTeam = {
       step: '整理待辦事項',
     },
     {
-      id: '03',
+      id: 'A19',
       name: '營運監測員',
       type: 'Knowledge 知識員',
       duty: '依據既有營運規則找出需要注意的異常，例如逾期案件、逾期應收與即將到期的計畫期限。',
@@ -38,7 +38,7 @@ export const opsTeam = {
       step: '檢查異常狀況',
     },
     {
-      id: '04',
+      id: 'A20',
       name: '營運摘要員',
       type: 'Worker 執行員',
       duty: '整理每日重點資訊並產出供負責人閱讀的營運摘要。',

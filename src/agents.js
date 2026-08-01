@@ -37,8 +37,8 @@ export const agentTeam = {
   ],
   agents: [
     {
-      id: 'A01',
-      name: '問題分類員',
+      id: 'A14',
+      name: '客服問題分類員',
       type: 'Router 分派員',
       assignee: '待指派',
       duty: '判斷顧客問題的類型，並將案件交給下一個正確流程。',
@@ -62,7 +62,7 @@ export const agentTeam = {
       rule: '無法明確分類時，標記為「無法判斷」交由人工處理，不得自行猜測。',
     },
     {
-      id: 'A02',
+      id: 'A15',
       name: '客服資料查詢員',
       type: 'Knowledge 知識員',
       assignee: '待指派',
@@ -90,7 +90,7 @@ export const agentTeam = {
       rule: '查不到資料時回報「資料不足」，而不是自行補出答案。',
     },
     {
-      id: 'A03',
+      id: 'A16',
       name: '客服回覆草擬員',
       type: 'Worker 執行員',
       assignee: '待指派',

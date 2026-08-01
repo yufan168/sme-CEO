@@ -2,8 +2,14 @@ import { departments } from './departments.js'
 import { authority, authorityNote } from './authority.js'
 import { businessLines, businessLinesNote } from './businessLines.js'
 import { agentTeam } from './agents.js'
-import { agentTeams, agentTeamsNote } from './agentTeams.js'
 import { opsTeam } from './agentTeamOps.js'
+import {
+  blueprint,
+  blueprintNote,
+  blueprintOverview,
+  blueprintPrinciple,
+  rolloutNote,
+} from './agentBlueprint.js'
 import WorkflowDiagram from './WorkflowDiagram.jsx'
 
 export function HomePage() {
@@ -170,7 +176,7 @@ export function DepartmentsPage() {
 function AgentTeamSection({ team }) {
   return (
     <section className="card-group">
-      <h2 className="group-title">Agent 配置：{team.department}</h2>
+      <h2 className="group-title">深入規格：{team.department}（每日營運）</h2>
       <p className="group-note">{team.note}</p>
       {team.scopeNote && <p className="group-note">{team.scopeNote}</p>}
 
@@ -234,11 +240,113 @@ function AgentTeamSection({ team }) {
   )
 }
 
-export function AiStaffPage() {
+function BlueprintSection() {
   return (
     <>
       <section className="card-group">
-        <h2 className="group-title">Agent 配置：{agentTeam.department}</h2>
+        <h2 className="group-title">Agent Team 藍圖</h2>
+        <p className="group-note">{blueprintNote}</p>
+
+        <article className="card dept-card">
+          <h3 className="dept-name">整體配置總覽</h3>
+          <div className="dept-block">
+            {blueprintOverview.map((row) => (
+              <div className="dept-step" key={row.dept}>
+                <p className="dept-step-name">
+                  {row.dept}　{row.count} 個
+                </p>
+                <p className="dept-step-text">{row.scope}</p>
+              </div>
+            ))}
+            <div className="dept-step">
+              <p className="dept-step-name">合計　19 個 Agent</p>
+              <p className="dept-step-reason">不代表需要 19 個真人</p>
+            </div>
+          </div>
+          <div className="dept-block">
+            <h4 className="dept-label">系統設計共通原則</h4>
+            <p className="dept-step-text">{blueprintPrinciple}</p>
+          </div>
+          <div className="dept-block">
+            <p className="dept-step-reason">{rolloutNote}</p>
+          </div>
+        </article>
+      </section>
+
+      {blueprint.map((dept) => (
+        <section className="card-group" key={dept.department}>
+          <h2 className="group-title">{dept.department}</h2>
+          {dept.note && <p className="group-note">{dept.note}</p>}
+
+          <article className="card dept-card">
+            <h3 className="dept-name">建議流程</h3>
+            <p className="dept-flow">
+              {dept.flow.map((step, index) => (
+                <span key={step}>
+                  {index > 0 && <span className="dept-arrow"> → </span>}
+                  {step}
+                </span>
+              ))}
+            </p>
+          </article>
+
+          <div className="dept-grid agent-grid">
+            {dept.agents.map((agent) => (
+              <article className="card dept-card" key={agent.id}>
+                <h3 className="dept-name">
+                  {agent.id}　{agent.name}
+                </h3>
+                <p className="agent-type">{agent.type}</p>
+                <p className="dept-duty">{agent.duty}</p>
+                <p className="dept-role">
+                  <span className="dept-role-name">所屬部門</span>
+                  <span>{dept.department}</span>
+                </p>
+                <p className="dept-role">
+                  <span className="dept-role-name">負責人</span>
+                  <span>待指派</span>
+                </p>
+
+                {agent.scope && (
+                  <div className="dept-block">
+                    <h4 className="dept-label">{agent.scopeLabel}</h4>
+                    <ul className="dept-list">
+                      {agent.scope.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <div className="dept-block">
+                  <h4 className="dept-label">工作邊界</h4>
+                  <p className="dept-step-text">{agent.limit}</p>
+                </div>
+              </article>
+            ))}
+
+            <article className="card dept-card">
+              <h3 className="dept-name">一定留給人</h3>
+              <ul className="dept-list">
+                {dept.humanGates.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </article>
+          </div>
+        </section>
+      ))}
+    </>
+  )
+}
+
+export function AiStaffPage() {
+  return (
+    <>
+      <BlueprintSection />
+
+      <section className="card-group">
+        <h2 className="group-title">深入規格：{agentTeam.department}</h2>
         <p className="group-note">{agentTeam.note}</p>
         <p className="group-note">{agentTeam.scopeNote}</p>
 
@@ -349,45 +457,6 @@ export function AiStaffPage() {
 
       <AgentTeamSection team={opsTeam} />
 
-      <section className="card-group">
-        <h2 className="group-title">其他部門的 Agent 配置</h2>
-        <p className="group-note">{agentTeamsNote}</p>
-        <div className="dept-grid">
-          {agentTeams.map((team) => (
-            <article className="card dept-card" key={team.department}>
-              <h3 className="dept-name">{team.department}</h3>
-
-              <div className="dept-block">
-                <h4 className="dept-label">Agent</h4>
-                {team.agents.map((agent) => (
-                  <div className="dept-step" key={agent.name}>
-                    <p className="dept-step-name">{agent.name}</p>
-                    <p className="dept-step-reason">{agent.type}</p>
-                    <p className="dept-step-text">{agent.duty}</p>
-                    <p className="dept-role">
-                      <span className="dept-role-name">負責人</span>
-                      <span>待指派</span>
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="dept-block">
-                <h4 className="dept-label">留人的控制點</h4>
-                <ul className="dept-list">
-                  {team.gates.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="dept-block">
-                <p className="dept-step-text">{team.note}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
     </>
   )
 }
