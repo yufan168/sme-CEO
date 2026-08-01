@@ -176,4 +176,193 @@ export const workflows = [
     responsibilityLine:
       '人提供真實清點 → AI 監測與分析 → AI 提出製作建議 → 人決定並執行 → AI 依確認交付資料更新紀錄',
   },
+  {
+    id: 'brand-content',
+    name: '品牌內容企劃與發布流程',
+    department: '客戶開發與關係管理部',
+    focus: '行銷與品牌經營',
+    shape: 'Chain 為主，必要的 Branch 出現在負責人審核：核准往發布，退回修改則附上意見回到內容撰寫，形成修改迴圈。Parallel 不使用。核心原則：AI 起草、人審核、人發布。',
+    definition: `flowchart LR
+  start(["開始"])
+  request["提出行銷需求"]
+  topic["規劃行銷主題"]
+  brand["整理品牌資料"]
+  draft["撰寫內容初稿"]
+  assets["整理發布素材"]
+  review{"負責人審核"}
+  publish["發布內容"]
+  collect["收集成效資料"]
+  analyze["整理成效分析"]
+  result["負責人檢視成效"]
+  finish(["結束"])
+  start --> request --> topic --> brand --> draft --> assets --> review
+  review -->|核准| publish
+  publish --> collect --> analyze --> result --> finish
+  review -->|退回修改並附上意見| draft
+  classDef systemNode fill:#F2EEEA,stroke:#A99B92,color:#5A4940;
+  classDef agentNode fill:#FFF4C2,stroke:#F7B729,color:#5C4219;
+  classDef humanNode fill:#372C27,stroke:#372C27,color:#FFFFFF;
+  classDef decisionNode fill:#372C27,stroke:#F7B729,color:#FFFFFF,stroke-width:3px;
+  class start,collect,finish systemNode;
+  class topic,brand,draft,assets,analyze agentNode;
+  class request,publish,result humanNode;
+  class review decisionNode;`,
+    nodes: [
+      { id: '－', work: '開始', owner: '系統起點', kind: 'system' },
+      { id: 'A', work: '提出行銷需求', owner: '人', kind: 'human' },
+      { id: 'B', work: '規劃行銷主題', owner: 'Agent：主題企劃員（M01）', kind: 'agent' },
+      { id: 'C', work: '整理品牌資料', owner: 'Agent：品牌資料員（M02）', kind: 'agent' },
+      { id: 'D', work: '撰寫內容初稿', owner: 'Agent：內容撰寫員（M03）', kind: 'agent' },
+      { id: 'E', work: '整理發布素材', owner: 'Agent：素材整理員（M04）', kind: 'agent' },
+      { id: 'F', work: '負責人審核', owner: '人（判斷節點）', kind: 'decision' },
+      { id: 'G', work: '發布內容', owner: '人', kind: 'human' },
+      { id: 'H', work: '收集成效資料', owner: '系統／人', kind: 'system' },
+      { id: 'I', work: '整理成效分析', owner: 'Agent：成效分析員（M05）', kind: 'agent' },
+      { id: 'J', work: '負責人檢視成效', owner: '人', kind: 'human' },
+      { id: '－', work: '結束', owner: '系統終點', kind: 'system' },
+    ],
+    keyRule: {
+      title: '審核分岔的兩條路徑',
+      text: '核准 → 發布內容 → 收集成效資料 → 整理成效分析 → 負責人檢視成效 → 結束。退回修改 → 附上修改意見 → 回到撰寫內容初稿 → 整理發布素材 → 負責人重新審核。退回時必須附上修改意見，否則內容撰寫員只能重猜。',
+    },
+    humanGates: [
+      {
+        id: 'A',
+        name: '提出行銷需求',
+        items: [
+          '為什麼要做本次行銷',
+          '要推廣的商品、服務或活動',
+          '預計發布時間',
+          '必須遵守的限制',
+          '是否涉及價格、優惠或活動規則',
+        ],
+        rule: 'Agent 不應自行啟動行銷活動，也不應自行設定促銷政策。',
+      },
+      {
+        id: 'F',
+        name: '負責人審核（判斷節點）',
+        items: [
+          '商品與服務資訊是否正確',
+          '價格與優惠是否已核准',
+          '供應或服務量能是否符合現況',
+          '文案是否符合品牌語氣',
+          '圖片與文字是否相符',
+          '是否含有誤導或過度承諾',
+          '發布時機是否適當',
+        ],
+        rule: '這是整條流程的正式判斷節點。核准進入發布；退回修改必須附上意見，回到內容撰寫。',
+      },
+      {
+        id: 'G',
+        name: '發布內容',
+        items: [
+          '商品或服務供應',
+          '活動規則',
+          '價格或優惠',
+          '品牌立場',
+          '對顧客的公開說明',
+        ],
+        rule: '正式發布可能代表公司對以上任一項的承諾，Agent 不可登入社群平台自動發布。',
+      },
+      {
+        id: 'J',
+        name: '負責人檢視成效',
+        items: [
+          '哪些表現值得保留',
+          '哪些問題需要修正',
+          '是否採用 Agent 的改善建議',
+          '是否影響下一次行銷方向',
+        ],
+        rule: '成效分析不應自動啟動下一次活動。',
+      },
+    ],
+    contracts: [
+      {
+        node: '節點 B：主題企劃員（M01）',
+        inputs: ['行銷目的', '商品或活動資訊', '預計發布時間', '限制條件'],
+        outputs: [
+          '建議主題',
+          '目標受眾',
+          '溝通重點',
+          '建議內容方向',
+          '待負責人確認事項',
+        ],
+      },
+      {
+        node: '節點 C：品牌資料員（M02）',
+        inputs: ['行銷主題', '商品或活動名稱', '溝通重點'],
+        outputs: [
+          '已確認品牌資料',
+          '商品或服務資訊',
+          '品牌語氣與用語',
+          '可使用歷史內容',
+          '活動規則',
+          '資料來源',
+          '待確認資訊',
+        ],
+      },
+      {
+        node: '節點 D：內容撰寫員（M03）',
+        inputs: ['行銷主題', '溝通重點', '品牌資料包', '退回修改意見（若有）'],
+        outputs: [
+          '內容標題',
+          '內容初稿',
+          '行動引導文字',
+          '引用資料',
+          '未確認資訊',
+          '需負責人確認事項',
+        ],
+      },
+      {
+        node: '節點 E：素材整理員（M04）',
+        inputs: ['內容初稿', '既有圖片或圖片清單', '商品與活動資料'],
+        outputs: [
+          '待審文案',
+          '圖片或素材清單',
+          '圖片順序',
+          '發布平台',
+          '建議發布時間',
+          '標籤與連結',
+          '尚缺素材',
+          '需人工確認事項',
+        ],
+      },
+      {
+        node: '節點 I：成效分析員（M05）',
+        inputs: [
+          '已發布內容',
+          '發布平台',
+          '實際發布時間',
+          '觸及與互動數據',
+          '顧客回應資料',
+        ],
+        outputs: [
+          '成效摘要',
+          '主要成效數據',
+          '表現較佳之處',
+          '表現較弱之處',
+          '可能原因',
+          '下次改善建議',
+          '資料限制',
+        ],
+      },
+    ],
+    permissions: [
+      { action: '讀取已核准品牌資料', allowed: true },
+      { action: '提出內容主題建議', allowed: true },
+      { action: '整理商品與品牌資料', allowed: true },
+      { action: '撰寫文案草稿', allowed: true },
+      { action: '整理發布素材', allowed: true },
+      { action: '整理成效數據', allowed: true },
+      { action: '提出改善建議', allowed: true },
+      { action: '決定促銷活動', allowed: false },
+      { action: '核准價格與優惠', allowed: false },
+      { action: '核准正式文案', allowed: false },
+      { action: '自動登入平台發布', allowed: false },
+      { action: '回應重大爭議', allowed: false },
+      { action: '自動啟動下一次行銷', allowed: false },
+    ],
+    responsibilityLine:
+      '人提出行銷目的 → AI 規劃、整理與起草 → 人審核品牌與承諾 → 人正式發布 → AI 整理成效 → 人決定下一步',
+  },
 ]

@@ -673,3 +673,13 @@ body {
 .perm-no {
   color: #a94c3d;
 }
+
+.legend-decision {
+  background-color: var(--brand-brown);
+  border: 2px solid var(--brand-gold);
+}
+
+.node-kind-decision {
+  color: var(--brand-brown);
+  font-weight: 600;
+}

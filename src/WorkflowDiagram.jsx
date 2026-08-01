@@ -44,6 +44,11 @@ function WorkflowDiagram({ flow }) {
         <li>
           <span className="legend-swatch legend-human"></span>人工關卡
         </li>
+        {flow.nodes.some((node) => node.kind === 'decision') && (
+          <li>
+            <span className="legend-swatch legend-decision"></span>判斷節點
+          </li>
+        )}
       </ul>
 
       <div className="dept-block">

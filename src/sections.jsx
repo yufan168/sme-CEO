@@ -470,7 +470,8 @@ export function WorkflowPage() {
       {workflows.map((flow) => (
         <section className="card-group" key={flow.id}>
           <h2 className="group-title">
-            {flow.name}（{flow.department}）
+            {flow.name}（{flow.department}
+            {flow.focus && `／${flow.focus}`}）
           </h2>
           <p className="group-note">{flow.shape}</p>
 
