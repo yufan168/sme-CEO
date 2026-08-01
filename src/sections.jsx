@@ -38,7 +38,7 @@ export function HomePage({ onNavigate }) {
           </div>
           <div className="info-row">
             <dt>成立年份</dt>
-            <dd>2026 年</dd>
+            <dd>2023 年</dd>
           </div>
           <div className="info-row">
             <dt>規模</dt>
