@@ -2,6 +2,7 @@ import { departments } from './departments.js'
 import { authority, authorityNote } from './authority.js'
 import { businessLines, businessLinesNote } from './businessLines.js'
 import { agentTeam } from './agents.js'
+import { agentTeams, agentTeamsNote } from './agentTeams.js'
 
 function App() {
   return (
@@ -257,6 +258,42 @@ function App() {
               ))}
             </div>
           </article>
+        </div>
+      </section>
+
+      <section className="section">
+        <h2 className="section-title">其他部門的 Agent 配置</h2>
+        <p className="section-note">{agentTeamsNote}</p>
+        <div className="dept-grid">
+          {agentTeams.map((team) => (
+            <article className="dept-card" key={team.department}>
+              <h3 className="dept-name">{team.department}</h3>
+
+              <div className="dept-block">
+                <h4 className="dept-label">Agent</h4>
+                {team.agents.map((agent) => (
+                  <div className="dept-step" key={agent.name}>
+                    <p className="dept-step-name">{agent.name}</p>
+                    <p className="dept-step-reason">{agent.type}</p>
+                    <p className="dept-step-text">{agent.duty}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="dept-block">
+                <h4 className="dept-label">留人的控制點</h4>
+                <ul className="dept-list">
+                  {team.gates.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="dept-block">
+                <p className="dept-step-text">{team.note}</p>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
     </main>
