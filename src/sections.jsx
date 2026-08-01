@@ -12,6 +12,7 @@ import {
   rolloutNote,
 } from './agentBlueprint.js'
 import WorkflowDiagram from './WorkflowDiagram.jsx'
+import { workflows } from './workflows.js'
 
 export function HomePage() {
   return (
@@ -462,10 +463,92 @@ export function AiStaffPage() {
 
 export function WorkflowPage() {
   return (
-    <section className="card">
-      <h2 className="card-title">客服回覆工作流程</h2>
-      <WorkflowDiagram />
-    </section>
+    <>
+      {workflows.map((flow) => (
+        <section className="card-group" key={flow.id}>
+          <h2 className="group-title">
+            {flow.name}（{flow.department}）
+          </h2>
+          <p className="group-note">{flow.shape}</p>
+
+          <article className="card">
+            <WorkflowDiagram flow={flow} />
+          </article>
+
+          {flow.keyRule && (
+            <article className="card dept-card">
+              <h3 className="dept-name">{flow.keyRule.title}</h3>
+              <p className="dept-step-text">{flow.keyRule.text}</p>
+            </article>
+          )}
+
+          {flow.humanGates && (
+            <div className="dept-grid agent-grid">
+              {flow.humanGates.map((gate) => (
+                <article className="card dept-card" key={gate.id}>
+                  <h3 className="dept-name">
+                    {gate.id}　{gate.name}（留人）
+                  </h3>
+                  <ul className="dept-list">
+                    {gate.items.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                  <div className="dept-block">
+                    <p className="dept-step-text">{gate.rule}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+
+          {flow.contracts && (
+            <div className="dept-grid agent-grid">
+              {flow.contracts.map((row) => (
+                <article className="card dept-card" key={row.node}>
+                  <h3 className="dept-name">{row.node}</h3>
+                  <div className="dept-block">
+                    <h4 className="dept-label">輸入</h4>
+                    <ul className="dept-list">
+                      {row.inputs.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="dept-block">
+                    <h4 className="dept-label">輸出</h4>
+                    <ul className="dept-list">
+                      {row.outputs.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+
+          {flow.permissions && (
+            <article className="card dept-card">
+              <h3 className="dept-name">Agent 權限邊界</h3>
+              <div className="dept-block">
+                <p className="dept-step-text">{flow.responsibilityLine}</p>
+              </div>
+              <div className="dept-block">
+                {flow.permissions.map((row) => (
+                  <p className="dept-role" key={row.action}>
+                    <span className={row.allowed ? 'perm-yes' : 'perm-no'}>
+                      {row.allowed ? '可' : '不可'}
+                    </span>
+                    <span>{row.action}</span>
+                  </p>
+                ))}
+              </div>
+            </article>
+          )}
+        </section>
+      ))}
+    </>
   )
 }
 
