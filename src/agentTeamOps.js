@@ -1,5 +1,6 @@
 export const opsTeam = {
   department: '營運與財務管理部',
+  focus: '每日營運',
   note: '四個 Agent 加三個人工控制點，形成一條固定的 Chain 流程，不需要 Branch 或 Parallel。AI 成為每日營運幕僚，但不成為公司的管理者。',
   scopeNote:
     '本區為每日營運資訊整理流程的實作規格，內容已依顧問業調整（案件、應收付款、專案排程）。編號 A01–A04 為此規格內部編號。合約、請款與核銷的 Agent 配置尚未定義。',

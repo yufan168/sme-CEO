@@ -278,7 +278,10 @@ function BlueprintSection() {
 function AgentTeamSection({ team }) {
   return (
     <section className="card-group">
-      <h2 className="group-title">深入規格：{team.department}</h2>
+      <h2 className="group-title">
+        深入規格：{team.department}
+        {team.focus && `（${team.focus}）`}
+      </h2>
       <p className="group-note">{team.note}</p>
       {team.scopeNote && <p className="group-note">{team.scopeNote}</p>}
 

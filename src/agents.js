@@ -1,5 +1,6 @@
 export const agentTeam = {
   department: '客戶服務部',
+  focus: '顧客來訊處理',
   note: '四個 Agent 加兩個人工控制點。每個 Agent 只做一件事：訊息整理員不分類也不查資料、問題分派員只分類與分流、訂單資料查詢員只找資料、客服回覆撰寫員只產生草稿。',
   scopeNote:
     '本區為顧客來訊處理流程的實作規格。編號 A01–A04 為此規格內部編號，與上方 Agent Team 藍圖的 A01–A19 不同系列。',
