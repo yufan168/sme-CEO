@@ -1,0 +1,101 @@
+:root {
+  --text: #222222;
+  --text-muted: #888888;
+  --border: #cccccc;
+  --bg: #ffffff;
+
+  font-family: system-ui, 'Segoe UI', Roboto, 'Noto Sans TC', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text);
+  background-color: var(--bg);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 20px;
+}
+
+.section + .section {
+  margin-top: 56px;
+}
+
+.home {
+  text-align: center;
+}
+
+.company-name {
+  font-size: 32px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.tagline {
+  font-size: 16px;
+  margin: 12px 0 0;
+}
+
+.enter-button {
+  margin-top: 24px;
+  padding: 10px 24px;
+  font-size: 16px;
+  font-family: inherit;
+  color: var(--text);
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.section-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0 0 16px;
+}
+
+.info-list {
+  margin: 0;
+}
+
+.info-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.info-row dt {
+  flex: 0 0 96px;
+  color: var(--text-muted);
+}
+
+.info-row dd {
+  margin: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.org-chart-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 240px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.org-chart-placeholder {
+  margin: 0;
+  color: var(--text-muted);
+}
