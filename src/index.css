@@ -739,3 +739,129 @@ body {
   color: #5c4219;
   font-weight: 600;
 }
+
+.sidebar-item.is-settings {
+  margin-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0 0 4px 4px;
+  padding-top: 14px;
+}
+
+.engine-badge {
+  margin: 0;
+  padding: 6px 8px;
+  font-size: 13px;
+  border-radius: 4px;
+}
+
+.engine-on {
+  color: #cfe3d4;
+  background-color: rgba(79, 118, 90, 0.35);
+}
+
+.engine-off {
+  color: #cfc4bc;
+  background-color: rgba(255, 255, 255, 0.07);
+}
+
+.field {
+  margin-top: 16px;
+}
+
+.field-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.field-input {
+  width: 100%;
+  padding: 8px 10px;
+  font: inherit;
+  color: var(--text);
+  background-color: var(--paper);
+  border: 1px solid #dcd3cc;
+  border-radius: 4px;
+}
+
+.field-input:focus {
+  outline: none;
+  border-color: var(--brand-gold);
+  box-shadow: 0 0 0 3px rgba(247, 183, 41, 0.18);
+}
+
+.field-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.field-actions .enter-button {
+  margin-top: 0;
+}
+
+.ghost-button {
+  padding: 10px 24px;
+  font: inherit;
+  color: var(--brand-brown-mid);
+  background-color: var(--paper);
+  border: 1px solid #d8cec6;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.ghost-button:hover {
+  background-color: #fff8dc;
+  border-color: var(--brand-gold);
+}
+
+.field-message {
+  margin: 16px 0 0;
+  color: var(--brand-brown-mid);
+}
+
+.run-status {
+  color: var(--text-muted);
+}
+
+.run-node {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.run-output {
+  margin: 8px 0 0;
+  padding: 10px;
+  font: inherit;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background-color: var(--cream);
+  border-radius: 4px;
+}
+
+.demo-flag {
+  display: inline-block;
+  margin: 6px 0 0;
+  padding: 2px 8px;
+  font-size: 13px;
+  color: #5c4219;
+  background-color: var(--brand-gold-soft);
+  border: 1px solid var(--brand-gold);
+  border-radius: 3px;
+}
+
+.run-error {
+  margin: 8px 0 0;
+  color: #a94c3d;
+}
+
+.run-waiting {
+  margin: 8px 0 0;
+  color: var(--brand-brown);
+  font-weight: 600;
+}

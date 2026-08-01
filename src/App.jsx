@@ -1,5 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { hasApiKey } from './aiSettings.js'
 import {
+  AiSettingsPage,
   HomePage,
   OrgPage,
   DepartmentsPage,
@@ -19,11 +21,14 @@ const pages = [
   { id: 'review', label: '審核中心', ready: false },
   { id: 'permission', label: '權限', ready: false },
   { id: 'automation', label: '自動化', ready: false },
+  { id: 'ai-settings', label: 'AI 設定', ready: true, render: AiSettingsPage, group: 'settings' },
 ]
 
 function App() {
   const [activeId, setActiveId] = useState('home')
   const contentRef = useRef(null)
+  const [engineReady, setEngineReady] = useState(hasApiKey())
+  const refreshEngine = useCallback(() => setEngineReady(hasApiKey()), [])
   const active = pages.find((page) => page.id === activeId)
   const Content = active.render ?? PendingPage
 
@@ -48,7 +53,7 @@ function App() {
               key={page.id}
               type="button"
               className={
-                'sidebar-item' +
+                (page.group === 'settings' ? 'sidebar-item is-settings' : 'sidebar-item') +
                 (page.id === activeId ? ' is-active' : '') +
                 (page.ready ? '' : ' is-pending')
               }
@@ -59,6 +64,9 @@ function App() {
             </button>
           ))}
         </nav>
+        <p className={engineReady ? 'engine-badge engine-on' : 'engine-badge engine-off'}>
+          {engineReady ? 'AI 引擎：已接' : 'AI 引擎：未接（示範模式）'}
+        </p>
         <p className="sidebar-motto">AI 起草 · 人審核 · 人發送</p>
       </aside>
 
@@ -67,7 +75,7 @@ function App() {
           <h1 className="topbar-title">{active.label}</h1>
         </header>
         <main className="page-content" ref={contentRef}>
-          <Content onNavigate={setActiveId} />
+          <Content onNavigate={setActiveId} onEngineChange={refreshEngine} />
         </main>
       </div>
     </div>

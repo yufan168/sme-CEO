@@ -13,6 +13,17 @@ import {
 } from './agentBlueprint.js'
 import WorkflowDiagram from './WorkflowDiagram.jsx'
 import { workflows } from './workflows.js'
+import { useState } from 'react'
+import {
+  clearSettings,
+  getModel,
+  getProvider,
+  hasApiKey,
+  maskedKeyInfo,
+  providers,
+  saveSettings,
+} from './aiSettings.js'
+import { createRun, runWorkflow } from './runner.js'
 
 export function HomePage({ onNavigate }) {
   return (
@@ -497,6 +508,8 @@ export function WorkflowPage() {
             <WorkflowDiagram flow={flow} />
           </article>
 
+          <WorkflowRunner flow={flow} />
+
           {flow.keyRule && (
             <article className="card dept-card">
               <h3 className="dept-name">{flow.keyRule.title}</h3>
@@ -571,6 +584,229 @@ export function WorkflowPage() {
         </section>
       ))}
     </>
+  )
+}
+
+export function AiSettingsPage({ onEngineChange }) {
+  const [apiKey, setApiKey] = useState('')
+  const [provider, setProvider] = useState(getProvider())
+  const [model, setModel] = useState(
+    () => getModel() || providers.find((p) => p.id === getProvider())?.defaultModel || ''
+  )
+  const [message, setMessage] = useState('')
+  const [connected, setConnected] = useState(hasApiKey())
+  const current = providers.find((p) => p.id === provider)
+
+  function handleSave(event) {
+    event.preventDefault()
+    const result = saveSettings({ apiKey, model, provider })
+    setMessage(result.message)
+    if (result.ok) {
+      setApiKey('')
+      setConnected(true)
+      onEngineChange?.()
+    }
+  }
+
+  function handleClear() {
+    const result = clearSettings()
+    setMessage(result.message)
+    setApiKey('')
+    setConnected(false)
+    onEngineChange?.()
+  }
+
+  return (
+    <>
+      <section className="card">
+        <h2 className="card-title">AI 設定</h2>
+        <p className="group-note">
+          金鑰只存在這個瀏覽器分頁的工作階段：重新整理仍在，關閉分頁即清除，不寫進原始碼或
+          Git。呼叫模型時金鑰會送給你選擇的 AI 供應商，只是不經過本系統的伺服器（本版無後端）。
+        </p>
+
+        <form onSubmit={handleSave}>
+          <div className="field">
+            <label className="field-label" htmlFor="ai-provider">
+              供應商
+            </label>
+            <select
+              id="ai-provider"
+              className="field-input"
+              value={provider}
+              onChange={(event) => {
+                const next = event.target.value
+                setProvider(next)
+                const preset = providers.find((p) => p.id === next)
+                if (preset) setModel(preset.defaultModel)
+              }}
+            >
+              {providers.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="field">
+            <label className="field-label" htmlFor="ai-key">
+              API 金鑰
+            </label>
+            <input
+              id="ai-key"
+              className="field-input"
+              type="password"
+              autoComplete="off"
+              spellCheck="false"
+              placeholder={current?.keyHint}
+              value={apiKey}
+              onChange={(event) => setApiKey(event.target.value)}
+            />
+          </div>
+
+          <div className="field">
+            <label className="field-label" htmlFor="ai-model">
+              模型名稱
+            </label>
+            <input
+              id="ai-model"
+              className="field-input"
+              type="text"
+              autoComplete="off"
+              spellCheck="false"
+              value={model}
+              onChange={(event) => setModel(event.target.value)}
+            />
+          </div>
+
+          <div className="field-actions">
+            <button type="submit" className="enter-button">
+              儲存並啟用
+            </button>
+            <button type="button" className="ghost-button" onClick={handleClear}>
+              清除金鑰
+            </button>
+          </div>
+        </form>
+
+        {message && <p className="field-message">{message}</p>}
+
+        <div className="dept-block">
+          <h3 className="dept-label">AI 引擎狀態</h3>
+          <p className={connected ? 'engine-on' : 'engine-off'}>
+            {connected ? 'AI 引擎：已接' : 'AI 引擎：未接（示範模式）'}
+          </p>
+          {connected && <p className="dept-step-reason">{maskedKeyInfo()}</p>}
+          <p className="dept-step-reason">
+            狀態只表示這個工作階段中有沒有金鑰，不代表 API 一定能正常呼叫。
+          </p>
+        </div>
+      </section>
+
+      <section className="card">
+        <h2 className="card-title">這種做法的限制</h2>
+        <ul className="dept-list">
+          <li>金鑰放在瀏覽器，頁面 JavaScript 讀得到，發生 XSS 時可能外洩。</li>
+          <li>裝置上的惡意程式、開發者工具或高權限擴充功能都可能取得金鑰。</li>
+          <li>呼叫模型時金鑰會送往 AI 供應商，不是完全不離開裝置。</li>
+          <li>供應商不一定允許瀏覽器直接呼叫，可能被 CORS 擋下。</li>
+          <li>正式產品應由後端保管金鑰並代理請求，不應把金鑰放在前端。</li>
+        </ul>
+      </section>
+    </>
+  )
+}
+
+const statusLabels = {
+  pending: '尚未執行',
+  running: '執行中',
+  completed: '已完成',
+  waiting_human: '等待人工',
+  failed: '執行失敗',
+}
+
+const runStatusLabels = {
+  idle: '尚未執行',
+  running: '執行中',
+  waiting_human: '等待人工',
+  completed: '已完成',
+  failed: '執行失敗',
+}
+
+function WorkflowRunner({ flow }) {
+  const [run, setRun] = useState(null)
+  const [busy, setBusy] = useState(false)
+
+  async function handleRun() {
+    setBusy(true)
+    const fresh = createRun(flow)
+    setRun(fresh)
+    await runWorkflow(flow, fresh, (snapshot) => setRun(snapshot))
+    setBusy(false)
+  }
+
+  return (
+    <article className="card dept-card">
+      <h3 className="dept-name">執行</h3>
+      <div className="field-actions">
+        <button type="button" className="enter-button" onClick={handleRun} disabled={busy}>
+          {busy ? '執行中…' : '執行'}
+        </button>
+        {run && (
+          <span className="run-status">
+            流程狀態：{runStatusLabels[run.status]}
+            {run.mode === 'demo' ? '（示範模式）' : '（真實 AI）'}
+          </span>
+        )}
+      </div>
+
+      {run &&
+        flow.exec.map((node) => {
+          const record = run.nodes[node.id] ?? { status: 'pending' }
+          if (node.executor === 'system' && record.status === 'pending') return null
+          return (
+            <div className="run-node" key={node.id}>
+              <p className="dept-step-name">
+                {node.name}
+                {node.agentName && `　${node.agentName}`}
+              </p>
+              <p className="dept-role">
+                <span className="dept-role-name">狀態</span>
+                <span>{statusLabels[record.status]}</span>
+              </p>
+              {record.mode && (
+                <p className="dept-role">
+                  <span className="dept-role-name">模式</span>
+                  <span>{record.mode === 'demo' ? '示範模式' : '真實 AI'}</span>
+                </p>
+              )}
+              {record.mode === 'demo' && (
+                <p className="demo-flag">示範模式內容，非真實 AI 產出</p>
+              )}
+              {record.summary && (
+                <p className="dept-role">
+                  <span className="dept-role-name">做了什麼</span>
+                  <span>{record.summary}</span>
+                </p>
+              )}
+              {record.basis && (
+                <p className="dept-role">
+                  <span className="dept-role-name">根據什麼</span>
+                  <span>{record.basis.join('、')}</span>
+                </p>
+              )}
+              {record.output && <pre className="run-output">{record.output}</pre>}
+              {record.error && <p className="run-error">失敗原因：{record.error}</p>}
+              {record.status === 'waiting_human' && (
+                <p className="run-waiting">
+                  {record.waitingMessage}。前面 Agent 已完成，本流程已暫停，後續節點不會執行。
+                </p>
+              )}
+            </div>
+          )
+        })}
+    </article>
   )
 }
 
