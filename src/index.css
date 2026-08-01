@@ -634,3 +634,28 @@ body {
 .sidebar-nav {
   overflow-y: auto;
 }
+
+.sidebar-brand-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sidebar-brand-sub {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: #a9998f;
+}
+
+.node-kind-agent {
+  color: #5c4219;
+}
+
+.node-kind-human {
+  color: var(--brand-brown);
+  font-weight: 600;
+}
+
+.node-kind-system {
+  color: var(--muted);
+}

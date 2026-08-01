@@ -37,7 +37,10 @@ function App() {
       <aside className="sidebar">
         <div className="sidebar-brand">
           <span className="sidebar-mark">洺</span>
-          <span className="sidebar-brand-name">享洺有限公司</span>
+          <span className="sidebar-brand-text">
+            <span className="sidebar-brand-name">享洺有限公司</span>
+            <span className="sidebar-brand-sub">XIANG MING · AI WORKSPACE</span>
+          </span>
         </div>
         <nav className="sidebar-nav">
           {pages.map((page) => (
