@@ -38,6 +38,21 @@ function App() {
       </section>
 
       <section className="section">
+        <h2 className="section-title">組織架構</h2>
+        <div className="org-chart">
+          <div className="org-node org-root">享洺有限公司</div>
+          <div className="org-stem"></div>
+          <ul className="org-children">
+            {departments.map((dept) => (
+              <li className="org-child" key={dept.name}>
+                <div className="org-node">{dept.name}</div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section className="section">
         <h2 className="section-title">部門藍圖</h2>
         <div className="dept-grid">
           {departments.map((dept) => (
@@ -58,18 +73,26 @@ function App() {
               </div>
 
               <div className="dept-block">
-                <h4 className="dept-label">AI 負責</h4>
-                <ul className="dept-list">
-                  {dept.ai.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
+                <h4 className="dept-label">AI 與人的分工</h4>
+                {dept.split.map((row) => (
+                  <div className="dept-step" key={row.step}>
+                    <p className="dept-step-name">{row.step}</p>
+                    <p className="dept-role">
+                      <span className="dept-role-tag">AI</span>
+                      <span>{row.ai}</span>
+                    </p>
+                    <p className="dept-role">
+                      <span className="dept-role-tag">人</span>
+                      <span>{row.human}</span>
+                    </p>
+                  </div>
+                ))}
               </div>
 
               <div className="dept-block">
-                <h4 className="dept-label">人負責</h4>
+                <h4 className="dept-label">人必須保留的核心權責</h4>
                 <ul className="dept-list">
-                  {dept.human.map((item) => (
+                  {dept.core.map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
