@@ -891,3 +891,28 @@ body {
 .card-group[id^='dept-'] {
   scroll-margin-top: 16px;
 }
+
+.org-agent-link {
+  width: 100%;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.org-agent-link:hover {
+  background-color: var(--brand-gold);
+}
+
+.org-agent-link:focus-visible {
+  outline: 2px solid var(--brand-brown);
+  outline-offset: 2px;
+}
+
+.dept-card[id^='agent-'] {
+  scroll-margin-top: 16px;
+}
+
+.card-group[id^='flow-'] {
+  scroll-margin-top: 16px;
+}

@@ -105,8 +105,8 @@ async function executeAgentNode(workflow, run, node) {
 }
 
 // onUpdate 會在每次狀態改變時被呼叫，讓畫面即時反映進度。
-export async function runWorkflow(workflow, run, onUpdate) {
-  let current = findNode(workflow, workflow.exec[0].id)
+export async function runWorkflow(workflow, run, onUpdate, startId) {
+  let current = findNode(workflow, startId ?? workflow.exec[0].id)
   run.status = 'running'
   onUpdate({ ...run })
 
@@ -151,4 +151,38 @@ export async function runWorkflow(workflow, run, onUpdate) {
   run.currentNodeId = null
   onUpdate({ ...run })
   return run
+}
+
+// 人工關卡的決定。核准後從下一個節點續跑；退回則把指定節點之後全部重置再跑一次。
+export async function decideGate(workflow, run, nodeId, decision, onUpdate, note) {
+  const node = findNode(workflow, nodeId)
+  if (!node || node.executor !== 'human') return run
+
+  if (decision === 'approve') {
+    run.nodes[nodeId] = { status: 'completed', summary: '人工核准', decidedBy: '人' }
+    if (!node.next) {
+      run.status = 'completed'
+      run.currentNodeId = null
+      onUpdate({ ...run })
+      return run
+    }
+    return runWorkflow(workflow, run, onUpdate, node.next)
+  }
+
+  // 退回修改：必須指定回到哪個節點，否則不動作。
+  const target = node.rejectTo
+  if (!target) return run
+
+  run.nodes[nodeId] = {
+    status: 'pending',
+    rejectedNote: note || '退回修改，未附意見',
+  }
+  // 從退回目標開始，之後的節點全部重置。
+  let cursor = findNode(workflow, target)
+  while (cursor) {
+    run.nodes[cursor.id] = { status: 'pending' }
+    cursor = cursor.next ? findNode(workflow, cursor.next) : null
+  }
+  run.rejectNote = note || ''
+  return runWorkflow(workflow, run, onUpdate, target)
 }

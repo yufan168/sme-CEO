@@ -8,6 +8,7 @@ import {
   AiStaffPage,
   WorkflowPage,
   PendingPage,
+  ReviewCenterPage,
 } from './sections.jsx'
 
 const pages = [
@@ -18,7 +19,7 @@ const pages = [
   { id: 'ai-staff', label: 'AI 員工', ready: true, render: AiStaffPage },
   { id: 'workflow', label: '工作流程', ready: true, render: WorkflowPage },
   { id: 'knowledge', label: '知識庫', ready: false },
-  { id: 'review', label: '審核中心', ready: false },
+  { id: 'review', label: '審核中心', ready: true, render: ReviewCenterPage },
   { id: 'permission', label: '權限', ready: false },
   { id: 'automation', label: '自動化', ready: false },
   { id: 'ai-settings', label: 'AI 設定', ready: true, render: AiSettingsPage, group: 'settings' },

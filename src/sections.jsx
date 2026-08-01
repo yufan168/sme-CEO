@@ -12,6 +12,7 @@ import { agentTeam } from './agents.js'
 import { opsTeam } from './agentTeamOps.js'
 import { marketingTeam } from './agentTeamMarketing.js'
 import { trainingTeam } from './agentTeamTraining.js'
+import { governmentTeam } from './agentTeamGovernment.js'
 import {
   blueprint,
   blueprintNote,
@@ -25,7 +26,7 @@ import {
 } from './agentBlueprint.js'
 import WorkflowDiagram from './WorkflowDiagram.jsx'
 import { workflows } from './workflows.js'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   clearSettings,
   getModel,
@@ -35,7 +36,9 @@ import {
   providers,
   saveSettings,
 } from './aiSettings.js'
-import { createRun, runWorkflow } from './runner.js'
+import { createRun, decideGate, runWorkflow } from './runner.js'
+import { getRun, listWaiting, setRun, subscribe } from './runStore.js'
+import { workflows as allWorkflows } from './workflows.js'
 
 export function HomePage({ onNavigate }) {
   return (
@@ -86,8 +89,8 @@ export function OrgPage({ onNavigate }) {
     <section className="card">
       <h2 className="card-title">組織架構</h2>
       <p className="group-note">
-        公司之下為七個部門，各部門之下為該部門的 AI Agent。點選部門可直接跳到
-        AI 員工分頁的該部門欄位。人工控制點不列為節點，由部門與工作流程規格承接。
+        公司之下為七個部門，各部門之下為該部門的 AI Agent。點選部門或 Agent 可直接跳到
+        AI 員工分頁的對應欄位。人工控制點不列為節點，由部門與工作流程規格承接。
       </p>
       <div className="org-chart">
         <div className="org-node org-root">享洺有限公司</div>
@@ -105,10 +108,14 @@ export function OrgPage({ onNavigate }) {
               <ul className="org-grandchildren">
                 {dept.agents.map((agent) => (
                   <li className="org-grandchild" key={agent.id}>
-                    <div className="org-node org-agent">
+                    <button
+                      type="button"
+                      className="org-node org-agent org-agent-link"
+                      onClick={() => onNavigate('ai-staff', 'agent-' + agent.id)}
+                    >
                       <span className="org-agent-id">{agent.id}</span>
                       {agent.name}
-                    </div>
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -311,7 +318,11 @@ function BlueprintSection() {
 
           <div className="dept-grid agent-grid">
             {dept.agents.map((agent) => (
-              <article className="card dept-card" key={agent.id}>
+              <article
+                className="card dept-card"
+                key={agent.id}
+                id={'agent-' + agent.id}
+              >
                 <h3 className="dept-name">
                   {agent.id}　{agent.name}
                 </h3>
@@ -587,6 +598,7 @@ export function AiStaffPage() {
     <>
       <BlueprintSection />
       <AgentTeamSection team={trainingTeam} />
+      <AgentTeamSection team={governmentTeam} />
       <AgentTeamSection team={agentTeam} />
       <AgentTeamSection team={opsTeam} />
       <AgentTeamSection team={marketingTeam} />
@@ -598,7 +610,7 @@ export function WorkflowPage() {
   return (
     <>
       {workflows.map((flow) => (
-        <section className="card-group" key={flow.id}>
+        <section className="card-group" key={flow.id} id={'flow-' + flow.id}>
           <h2 className="group-title">
             {flow.name}（{flow.department}
             {flow.focus && `／${flow.focus}`}）
@@ -836,14 +848,27 @@ const runStatusLabels = {
 }
 
 function WorkflowRunner({ flow }) {
-  const [run, setRun] = useState(null)
+  const [run, setRunState] = useState(() => getRun(flow.id))
   const [busy, setBusy] = useState(false)
+  const [note, setNote] = useState('')
+
+  function publish(snapshot) {
+    setRunState(snapshot)
+    setRun(flow.id, snapshot)
+  }
 
   async function handleRun() {
     setBusy(true)
     const fresh = createRun(flow)
-    setRun(fresh)
-    await runWorkflow(flow, fresh, (snapshot) => setRun(snapshot))
+    publish(fresh)
+    await runWorkflow(flow, fresh, publish)
+    setBusy(false)
+  }
+
+  async function handleDecide(nodeId, decision) {
+    setBusy(true)
+    await decideGate(flow, run, nodeId, decision, publish, note)
+    setNote('')
     setBusy(false)
   }
 
@@ -899,15 +924,105 @@ function WorkflowRunner({ flow }) {
               )}
               {record.output && <pre className="run-output">{record.output}</pre>}
               {record.error && <p className="run-error">失敗原因：{record.error}</p>}
+              {record.rejectedNote && (
+                <p className="run-error">退回意見：{record.rejectedNote}</p>
+              )}
               {record.status === 'waiting_human' && (
-                <p className="run-waiting">
-                  {record.waitingMessage}。前面 Agent 已完成，本流程已暫停，後續節點不會執行。
-                </p>
+                <>
+                  <p className="run-waiting">
+                    {record.waitingMessage}。前面 Agent 已完成，本流程已暫停，後續節點不會執行。
+                  </p>
+                  {node.rejectTo && (
+                    <input
+                      className="field-input"
+                      type="text"
+                      placeholder="退回時請附上修改意見"
+                      value={note}
+                      onChange={(event) => setNote(event.target.value)}
+                    />
+                  )}
+                  <div className="field-actions">
+                    <button
+                      type="button"
+                      className="enter-button"
+                      disabled={busy}
+                      onClick={() => handleDecide(node.id, 'approve')}
+                    >
+                      {node.gateType === 'send' ? '確認送出' : '核准'}
+                    </button>
+                    {node.rejectTo && (
+                      <button
+                        type="button"
+                        className="ghost-button"
+                        disabled={busy}
+                        onClick={() => handleDecide(node.id, 'reject')}
+                      >
+                        退回修改
+                      </button>
+                    )}
+                  </div>
+                  <p className="dept-step-reason">
+                    這一步由人決定。核准才會往下走，退回會回到指定節點重做。
+                  </p>
+                </>
               )}
             </div>
           )
         })}
     </article>
+  )
+}
+
+export function ReviewCenterPage({ onNavigate }) {
+  const [, forceUpdate] = useState(0)
+  useEffect(() => subscribe(() => forceUpdate((n) => n + 1)), [])
+  const waiting = listWaiting()
+
+  return (
+    <>
+      <section className="card">
+        <h2 className="card-title">審核中心</h2>
+        <p className="group-note">
+          列出所有停在人工關卡、等待你處理的流程。執行紀錄只存在目前頁面記憶體，
+          重新整理後不保留。
+        </p>
+        {waiting.length === 0 ? (
+          <p className="pending-text">
+            目前沒有等待處理的流程。到工作流程分頁按下執行，跑到人工關卡就會出現在這裡。
+          </p>
+        ) : (
+          <div className="dept-block">
+            {waiting.map((item) => {
+              const flow = allWorkflows.find((w) => w.id === item.workflowId)
+              const node = flow?.exec.find((n) => n.id === item.nodeId)
+              if (!flow || !node) return null
+              return (
+                <div className="dept-step" key={item.workflowId}>
+                  <p className="dept-step-name">{flow.name}</p>
+                  <p className="dept-step-text">
+                    停在：{node.name}　{node.waitingMessage}
+                  </p>
+                  <p className="dept-step-reason">
+                    {flow.department}
+                    {flow.focus && `／${flow.focus}`}　模式：
+                    {item.run.mode === 'demo' ? '示範' : '真實 AI'}
+                  </p>
+                  <div className="field-actions">
+                    <button
+                      type="button"
+                      className="ghost-button"
+                      onClick={() => onNavigate('workflow', 'flow-' + flow.id)}
+                    >
+                      前往處理
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </section>
+    </>
   )
 }
 

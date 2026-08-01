@@ -52,7 +52,7 @@ export const workflows = [
         },
         next: 'approve',
       },
-      { id: 'approve', name: '主管審核', executor: 'human', gateType: 'review', waitingMessage: '等待人審核', next: 'send' },
+      { id: 'approve', name: '主管審核', executor: 'human', gateType: 'review', waitingMessage: '等待人審核', rejectTo: 'draft', next: 'send' },
       { id: 'send', name: '送出回覆', executor: 'human', gateType: 'send', waitingMessage: '等你決定送出', next: 'done' },
       { id: 'done', name: '流程完成', executor: 'system', systemType: 'end' },
     ],
@@ -128,7 +128,7 @@ export const workflows = [
         },
         next: 'confirm',
       },
-      { id: 'confirm', name: '負責人確認', executor: 'human', gateType: 'review', waitingMessage: '等待人審核', next: 'execute' },
+      { id: 'confirm', name: '負責人確認', executor: 'human', gateType: 'review', waitingMessage: '等待人審核', rejectTo: 'analyze', next: 'execute' },
       { id: 'execute', name: '執行製作或採購', executor: 'human', gateType: 'send', waitingMessage: '等你決定執行', next: 'update' },
       {
         id: 'update', name: '更新文件庫紀錄', executor: 'agent', agentId: 'D04', agentName: '文件紀錄員',
@@ -337,7 +337,7 @@ export const workflows = [
         },
         next: 'review',
       },
-      { id: 'review', name: '負責人審核', executor: 'human', gateType: 'review', waitingMessage: '等待人審核', next: 'publish' },
+      { id: 'review', name: '負責人審核', executor: 'human', gateType: 'review', waitingMessage: '等待人審核', rejectTo: 'draft', next: 'publish' },
       { id: 'publish', name: '發布內容', executor: 'human', gateType: 'send', waitingMessage: '等你決定送出', next: 'collect' },
       { id: 'collect', name: '收集成效資料', executor: 'system', systemType: 'data', next: 'analyze' },
       {
