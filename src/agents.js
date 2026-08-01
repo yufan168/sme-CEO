@@ -4,18 +4,43 @@ export const agentTeam = {
   scopeNote:
     '此處只涵蓋單次問答的處理流程。部門藍圖中的客戶服務部描述的是服務全貌，還包含追蹤處理進度、確認結案與彙整常見問題，兩者層次不同，並非重複。',
   flow: [
-    { step: '顧客來訊', owner: '不設 Agent，由既有客服管道接收' },
-    { step: '判斷問題類型', owner: 'Router 分派員' },
-    { step: '查詢相關資料', owner: 'Knowledge 知識員' },
-    { step: '草擬回覆', owner: 'Worker 執行員' },
-    { step: '主管審核', owner: '留人' },
-    { step: '送出回覆', owner: '留人' },
+    {
+      step: '顧客來訊',
+      owner: '不設 Agent，由既有客服管道接收',
+      reason: '這是流程觸發事件，不是需要獨立 Agent 執行的工作',
+    },
+    {
+      step: '判斷問題類型',
+      owner: 'Router 分派員',
+      reason: '適合依問題類型將案件分流',
+    },
+    {
+      step: '查詢相關資料',
+      owner: 'Knowledge 知識員',
+      reason: '適合從訂單、產品、服務規則等核准資料中找答案',
+    },
+    {
+      step: '草擬回覆',
+      owner: 'Worker 執行員',
+      reason: '適合依問題與查詢結果產生回覆草稿',
+    },
+    {
+      step: '主管審核',
+      owner: '留人，不配置 Reviewer',
+      reason: '涉及內容正確性、語氣、例外處理與公司責任',
+    },
+    {
+      step: '送出回覆',
+      owner: '留人，不配置 Agent',
+      reason: '對客戶正式發言或作出承諾，必須由人確認後送出',
+    },
   ],
   agents: [
     {
       id: 'A01',
       name: '問題分類員',
       type: 'Router 分派員',
+      assignee: '待指派',
       duty: '判斷顧客問題的類型，並將案件交給下一個正確流程。',
       scopeLabel: '處理範圍',
       scope: [
@@ -40,6 +65,7 @@ export const agentTeam = {
       id: 'A02',
       name: '客服資料查詢員',
       type: 'Knowledge 知識員',
+      assignee: '待指派',
       duty: '根據問題類型，查找與案件相關的訂單資料及公司核准資訊。',
       scopeLabel: '可查詢的資料範圍',
       scope: [
@@ -59,12 +85,15 @@ export const agentTeam = {
         '自行制定公司政策',
         '直接回覆顧客',
       ],
-      rule: '查不到資料時回報「資料不足」，而不是自行補出答案。輸出須區分已確認資料、資料來源、尚未確認的資訊。',
+      outputLabel: '輸出內容須清楚區分',
+      output: ['已確認資料', '找到的資料來源', '尚未確認或缺少的資訊'],
+      rule: '查不到資料時回報「資料不足」，而不是自行補出答案。',
     },
     {
       id: 'A03',
       name: '客服回覆草擬員',
       type: 'Worker 執行員',
+      assignee: '待指派',
       duty: '根據顧客問題與已確認資料，撰寫供主管審核的客服回覆草稿。',
       scopeLabel: '草稿應包含',
       scope: [
@@ -83,6 +112,14 @@ export const agentTeam = {
         '改變公司政策',
         '在資料不足時自行編造答案',
       ],
+      outputLabel: '建議輸出格式',
+      output: [
+        '【顧客問題摘要】',
+        '【已確認資料】',
+        '【建議回覆草稿】',
+        '【需主管確認事項】',
+        '【是否涉及承諾】是／否',
+      ],
       rule: '涉及退款、折扣、補償、法律責任或重大客訴時，必須在草稿中標示「需主管決定」。',
     },
   ],
@@ -97,7 +134,15 @@ export const agentTeam = {
         '是否對交期或結果作出承諾',
         '是否屬於客訴、爭議或特殊例外',
       ],
-      rule: '可核准草稿、修改草稿、要求重新查詢、升級為特殊案件或暫不回覆。不另設 Reviewer Agent，因為主管本身已是正式審核者。',
+      decisionLabel: '審核後可做的決定',
+      decisions: [
+        '核准草稿',
+        '修改草稿',
+        '要求重新查詢',
+        '升級為特殊案件',
+        '暫不回覆',
+      ],
+      rule: '不另設 Reviewer Agent，因為主管本身已是正式審核者。多一層 Reviewer 只會增加流程，卻不能取代人的責任判斷。',
     },
     {
       name: '送出回覆（留人）',

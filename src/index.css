@@ -289,6 +289,12 @@ body {
   margin: 2px 0 0;
 }
 
+.dept-step-reason {
+  margin: 2px 0 0;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
 .agent-type {
   margin: 4px 0 0;
   color: var(--text-muted);

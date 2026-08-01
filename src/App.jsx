@@ -166,6 +166,7 @@ function App() {
               <div className="dept-step" key={item.step}>
                 <p className="dept-step-name">{item.step}</p>
                 <p className="dept-step-text">{item.owner}</p>
+                <p className="dept-step-reason">{item.reason}</p>
               </div>
             ))}
           </div>
@@ -179,6 +180,10 @@ function App() {
               </h3>
               <p className="agent-type">{agent.type}</p>
               <p className="dept-duty">{agent.duty}</p>
+              <p className="dept-role">
+                <span className="dept-role-name">負責人</span>
+                <span>{agent.assignee}</span>
+              </p>
 
               <div className="dept-block">
                 <h4 className="dept-label">{agent.scopeLabel}</h4>
@@ -188,6 +193,17 @@ function App() {
                   ))}
                 </ul>
               </div>
+
+              {agent.output && (
+                <div className="dept-block">
+                  <h4 className="dept-label">{agent.outputLabel}</h4>
+                  <ul className="dept-list">
+                    {agent.output.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               <div className="dept-block">
                 <h4 className="dept-label">不能做</h4>
@@ -214,6 +230,16 @@ function App() {
                   ))}
                 </ul>
               </div>
+              {gate.decisions && (
+                <div className="dept-block">
+                  <h4 className="dept-label">{gate.decisionLabel}</h4>
+                  <ul className="dept-list">
+                    {gate.decisions.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               <div className="dept-block">
                 <p className="dept-step-text">{gate.rule}</p>
               </div>
