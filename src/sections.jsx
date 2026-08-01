@@ -11,6 +11,7 @@ import {
 import { agentTeam } from './agents.js'
 import { opsTeam } from './agentTeamOps.js'
 import { marketingTeam } from './agentTeamMarketing.js'
+import { trainingTeam } from './agentTeamTraining.js'
 import {
   blueprint,
   blueprintNote,
@@ -575,6 +576,7 @@ export function AiStaffPage() {
   return (
     <>
       <BlueprintSection />
+      <AgentTeamSection team={trainingTeam} />
       <AgentTeamSection team={agentTeam} />
       <AgentTeamSection team={opsTeam} />
       <AgentTeamSection team={marketingTeam} />
