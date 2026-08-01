@@ -6,9 +6,15 @@
 
 ## 開發
 
+```bash
 npm install
 npm run dev
+```
+
+啟動後開啟終端機顯示的本機網址即可瀏覽。
 
 ## 建置
 
+```bash
 npm run build
+```
