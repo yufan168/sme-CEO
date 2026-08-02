@@ -118,6 +118,8 @@ const rawEntries = [
   {
     id: 'FAQ-001',
     type: 'faq',
+    category: '公司知識',
+    version: 'v1.0',
     title: '享洺提供哪些服務',
     question: '享洺有限公司提供哪些服務？',
     answer:
@@ -137,6 +139,8 @@ const rawEntries = [
   {
     id: 'FAQ-002',
     type: 'faq',
+    category: '公司知識',
+    version: 'v1.0',
     title: '適合合作的對象',
     question: '哪些企業或組織適合與享洺合作？',
     answer:
@@ -156,6 +160,8 @@ const rawEntries = [
   {
     id: 'FAQ-003',
     type: 'faq',
+    category: '公司知識',
+    version: 'v1.0',
     title: '如何提出需求',
     question: '如何提出合作或諮詢需求？',
     answer:
@@ -175,6 +181,8 @@ const rawEntries = [
   {
     id: 'FAQ-004',
     type: 'faq',
+    category: '公司知識',
+    version: 'v1.0',
     title: '諮詢前的準備',
     question: '第一次諮詢前需要準備哪些資料？',
     answer:
@@ -194,6 +202,8 @@ const rawEntries = [
   {
     id: 'FAQ-005',
     type: 'faq',
+    category: '常見問題',
+    version: 'v1.0',
     title: '報價方式',
     question: '享洺如何報價？',
     answer:
@@ -213,6 +223,8 @@ const rawEntries = [
   {
     id: 'FAQ-006',
     type: 'faq',
+    category: '常見問題',
+    version: 'v1.0',
     title: '回覆時限',
     question: '提出需求後多久會收到回覆？',
     answer:
@@ -232,6 +244,8 @@ const rawEntries = [
   {
     id: 'FAQ-007',
     type: 'faq',
+    category: '服務流程',
+    version: 'v1.0',
     title: '顧問專案的進行方式',
     question: '顧問專案通常如何進行？',
     answer:
@@ -251,6 +265,8 @@ const rawEntries = [
   {
     id: 'FAQ-008',
     type: 'faq',
+    category: '政府計畫',
+    version: 'v1.0',
     title: '政府計畫協助範圍',
     question: '享洺可以協助政府計畫或補助申請嗎？',
     answer:
@@ -274,6 +290,8 @@ const rawEntries = [
   {
     id: 'FAQ-009',
     type: 'faq',
+    category: '常見問題',
+    version: 'v1.0',
     title: '課程客製化',
     question: '課程或企業內訓可以客製化嗎？',
     answer:
@@ -293,6 +311,8 @@ const rawEntries = [
   {
     id: 'FAQ-010',
     type: 'faq',
+    category: '常見問題',
+    version: 'v1.0',
     title: '客戶資料的處理',
     question: '享洺如何處理客戶資料？',
     answer:
@@ -312,6 +332,8 @@ const rawEntries = [
   {
     id: 'FAQ-011',
     type: 'faq',
+    category: '常見問題',
+    version: 'v1.0',
     title: 'AI 產出的對外使用',
     question: 'AI 產出的內容會直接對外使用嗎？',
     answer:
@@ -331,6 +353,8 @@ const rawEntries = [
   {
     id: 'FAQ-012',
     type: 'faq',
+    category: '升級規則',
+    version: 'v1.0',
     title: '疑問與申訴',
     question: '如果對服務有疑問或需要申訴，應如何處理？',
     answer:
@@ -351,6 +375,8 @@ const rawEntries = [
   {
     id: 'FAQ-013',
     type: 'faq',
+    category: '服務流程',
+    version: 'v1.0',
     title: '查詢專案進度',
     question: '我想知道專案現在做到哪裡了？',
     answer:
@@ -370,6 +396,8 @@ const rawEntries = [
   {
     id: 'FAQ-014',
     type: 'faq',
+    category: '政府計畫',
+    version: 'v1.0',
     title: '補件通知與期限',
     question: '你們說要補件，我要補什麼？什麼時候要給？',
     answer:
@@ -389,6 +417,8 @@ const rawEntries = [
   {
     id: 'FAQ-015',
     type: 'faq',
+    category: '服務流程',
+    version: 'v1.0',
     title: '交付物與驗收',
     question: '這個案子結束我會拿到什麼？怎麼算驗收完成？',
     answer:
@@ -408,6 +438,8 @@ const rawEntries = [
   {
     id: 'FAQ-016',
     type: 'faq',
+    category: '服務流程',
+    version: 'v1.0',
     title: '請款與發票',
     question: '什麼時候請款？發票怎麼開？',
     answer:
@@ -427,6 +459,8 @@ const rawEntries = [
   {
     id: 'FAQ-017',
     type: 'faq',
+    category: '服務流程',
+    version: 'v1.0',
     title: '改期與延期',
     question: '我們想把時間往後延，可以嗎？',
     answer:
@@ -446,6 +480,8 @@ const rawEntries = [
   {
     id: 'FAQ-018',
     type: 'faq',
+    category: '政府計畫',
+    version: 'v1.0',
     title: '政府計畫查核準備',
     question: '要查核了，我們要準備什麼？',
     answer:
@@ -465,6 +501,8 @@ const rawEntries = [
   {
     id: 'FAQ-019',
     type: 'faq',
+    category: '政府計畫',
+    version: 'v1.0',
     title: '核銷單據',
     question: '核銷的單據要怎麼準備？',
     answer:
@@ -484,6 +522,8 @@ const rawEntries = [
   {
     id: 'FAQ-020',
     type: 'faq',
+    category: '服務流程',
+    version: 'v1.0',
     title: '課程當天的安排',
     question: '上課當天需要我們準備什麼？',
     answer:
@@ -503,6 +543,8 @@ const rawEntries = [
   {
     id: 'FAQ-021',
     type: 'faq',
+    category: '常見問題',
+    version: 'v1.0',
     title: '教材的使用範圍',
     question: '上完課的教材，我們可以自己再拿去內部training嗎？',
     answer:
@@ -522,6 +564,8 @@ const rawEntries = [
   {
     id: 'FAQ-022',
     type: 'faq',
+    category: '服務流程',
+    version: 'v1.0',
     title: '追加需求',
     question: '可以順便幫我們多做這一項嗎？',
     answer:
@@ -541,6 +585,8 @@ const rawEntries = [
   {
     id: 'FAQ-023',
     type: 'faq',
+    category: '服務流程',
+    version: 'v1.0',
     title: '結案後的後續支援',
     question: '結案之後還能問問題嗎？',
     answer:
@@ -560,6 +606,8 @@ const rawEntries = [
   {
     id: 'FAQ-024',
     type: 'faq',
+    category: '升級規則',
+    version: 'v1.0',
     title: '對成果不滿意',
     question: '交付的東西跟我想的不一樣，怎麼辦？',
     answer:
@@ -579,6 +627,8 @@ const rawEntries = [
   {
     id: 'POL-001',
     type: 'policy',
+    category: '政策與原則',
+    version: 'v1.0',
     title: 'AI 使用與人工閘門政策',
     policyContent:
       'AI 可協助整理、分類、查詢、分析與草擬；涉及審核、決策、正式發布、送出、付款、申報或對外承諾時，必須由人員執行。核心原則：AI 起草／人審核／人發送。',
@@ -597,6 +647,8 @@ const rawEntries = [
   {
     id: 'POL-002',
     type: 'policy',
+    category: '政策與原則',
+    version: 'v1.0',
     title: '對外回覆政策',
     policyContent:
       '所有對外回覆只能使用已核准且未過期的公司資料。資料不足時不得自行推測；涉及價格、退款、補償、合約、法律責任、重大客訴或正式承諾時，必須轉交人工處理。',
@@ -615,6 +667,8 @@ const rawEntries = [
   {
     id: 'POL-003',
     type: 'policy',
+    category: '政策與原則',
+    version: 'v1.0',
     title: '報價與承諾政策',
     policyContent:
       'Agent 可以草擬提案與報價文件，但正式價格、折扣、付款條件、交付範圍、交付期限、追加服務及責任條款，只能由授權人員核准。口頭說明與 AI 草稿不構成正式承諾。',
@@ -633,6 +687,8 @@ const rawEntries = [
   {
     id: 'POL-004',
     type: 'policy',
+    category: '政策與原則',
+    version: 'v1.0',
     title: '資料正確性政策',
     policyContent:
       '所有知識與 Agent 輸出必須區分已確認資料、推測、缺少資料與待人工確認事項。不得將推測寫成事實，不得編造日期、金額、法規、案例或來源。',
@@ -651,6 +707,8 @@ const rawEntries = [
   {
     id: 'POL-005',
     type: 'policy',
+    category: '政策與原則',
+    version: 'v1.0',
     title: '客戶資料與保密政策',
     policyContent:
       '未經授權，不得將客戶機密、個人資料、帳號密碼、未公開財務資料或第三方受保護內容輸入外部 AI 工具。資料保存期限、刪除方式及權限規範為【請填入：正式資料管理政策】。',
@@ -669,6 +727,8 @@ const rawEntries = [
   {
     id: 'POL-006',
     type: 'policy',
+    category: '政策與原則',
+    version: 'v1.0',
     title: '知識入庫政策',
     policyContent:
       '任何內容進入正式 Knowledge Hub 前，必須確認來源可追溯、內容未過期、適用情境清楚、未包含未授權資料，並由負責人或專業人員核准。AI 不得自行核准知識入庫。',
@@ -687,6 +747,8 @@ const rawEntries = [
   {
     id: 'POL-007',
     type: 'policy',
+    category: '政策與原則',
+    version: 'v1.0',
     title: '政府計畫服務政策',
     policyContent:
       '享洺可協助資格初步比對、文件整理、草稿撰寫、期限提醒及文件完整性檢查；不保證符合資格、不保證通過、不保證核准金額，也不代替會計、法律專業人員或主管機關做正式認定。',
@@ -705,6 +767,8 @@ const rawEntries = [
   {
     id: 'POL-008',
     type: 'policy',
+    category: '政策與原則',
+    version: 'v1.0',
     title: '課程與教材政策',
     policyContent:
       '所有正式課程、講義、簡報、案例、數據與圖片在使用前，必須完成來源、版本、著作權與內容正確性確認。AI 產出的教材一律視為草稿。',
@@ -723,6 +787,8 @@ const rawEntries = [
   {
     id: 'POL-009',
     type: 'policy',
+    category: '升級規則',
+    version: 'v1.0',
     title: '異常與升級處理政策',
     policyContent:
       '資料矛盾、缺少關鍵資訊、涉及價格、退款、補償、合約、個資、政府申報、重大客訴、品牌危機、專業結論或正式決策時，Agent 必須停止自動處理並轉交人工。',
@@ -741,6 +807,8 @@ const rawEntries = [
   {
     id: 'POL-010',
     type: 'policy',
+    category: '政策與原則',
+    version: 'v1.0',
     title: '取消、改期與退款政策',
     policyContent:
       '取消、改期、訂金、已完成工作費用及退款規則，應依個案報價單、合約或課程公告辦理。正式規則尚未建立時，Agent 不得自行回答，必須轉交人工。正式規則：【請填入】',
@@ -759,6 +827,8 @@ const rawEntries = [
   {
     id: 'POL-011',
     type: 'policy',
+    category: '政策與原則',
+    version: 'v1.0',
     title: '追加需求與範圍變更政策',
     policyContent:
       '超出正式提案或合約範圍的新增需求，須另行確認工作內容、費用與時程。未經雙方書面確認前，不視為原服務範圍。',
@@ -777,6 +847,8 @@ const rawEntries = [
   {
     id: 'POL-012',
     type: 'policy',
+    category: '政策與原則',
+    version: 'v1.0',
     title: '智慧財產權與成果使用政策',
     policyContent:
       '顧問報告、教材、簡報、模板、錄影及其他成果的所有權、使用權、修改權、公開權及轉授權範圍，以正式合約或書面約定為準。未經授權，不得複製、轉售、公開或提供第三方使用。',
@@ -816,3 +888,24 @@ export function summaryOf(entry) {
   const text = entry.type === 'faq' ? entry.answer : entry.policyContent
   return text.length > 70 ? text.slice(0, 70) + '⋯' : text
 }
+
+// 分類。回覆範本與統一用語目前尚未建立，仍列出以顯示缺口。
+export const hubCategories = [
+  '公司知識',
+  '常見問題',
+  '服務流程',
+  '政府計畫',
+  '政策與原則',
+  '升級規則',
+  '回覆範本',
+  '統一用語',
+]
+
+export function countByCategory(category) {
+  return knowledgeHub.filter((entry) => entry.category === category).length
+}
+
+export const hubCategoryStats = hubCategories.map((name) => ({
+  name,
+  count: countByCategory(name),
+}))

@@ -8,11 +8,11 @@ import {
 import { authority, authorityNote } from './authority.js'
 import { businessLines, caseLifecycle, channels } from './businessLines.js'
 import {
-  hubFaq,
+  hubCategoryStats,
   hubNote,
-  hubPolicies,
   hubRules,
   hubStats,
+  knowledgeHub,
   riskLabel,
   statusLabel,
   summaryOf,
@@ -316,21 +316,41 @@ function buildEntries() {
 }
 
 function HubCard({ entry }) {
+  const [open, setOpen] = useState(false)
+
   return (
     <article
       className={entry.agentUsable ? 'card hub-card' : 'card hub-card is-unapproved'}
       id={'hub-' + entry.id}
     >
-      <p className="hub-id">{entry.id}</p>
+      <p className="hub-head">
+        <span className="hub-id">{entry.id}</span>
+        <span className="hub-cat">{entry.category}</span>
+      </p>
+
       <h3 className="dept-name">{entry.title}</h3>
+      <p className="dept-duty">{summaryOf(entry)}</p>
+
+      <p className="hub-tags">
+        {entry.tags.map((tag) => (
+          <span className="hub-tag" key={tag}>
+            #{tag}
+          </span>
+        ))}
+      </p>
 
       <p className="hub-badges">
+        <span className={'hub-risk hub-risk-' + entry.riskLevel}>
+          風險：{riskLabel(entry.riskLevel).replace('風險', '')}
+        </span>
         <span className={'hub-status hub-status-' + entry.status}>
           {statusLabel(entry.status)}
         </span>
-        <span className={'hub-risk hub-risk-' + entry.riskLevel}>
-          {riskLabel(entry.riskLevel)}
-        </span>
+        <span className="hub-meta">{entry.version}</span>
+        <span className="hub-meta">更新 {entry.lastUpdated}</span>
+      </p>
+
+      <p className="hub-badges">
         <span className={entry.canQuoteExternally ? 'hub-flag is-yes' : 'hub-flag is-no'}>
           {entry.canQuoteExternally ? '可對外引用' : '不可對外引用'}
         </span>
@@ -339,14 +359,55 @@ function HubCard({ entry }) {
         </span>
       </p>
 
-      {entry.type === 'faq' && <p className="hub-question">Q：{entry.question}</p>}
-      <p className="dept-duty">{summaryOf(entry)}</p>
-
-      {entry.hasPlaceholder && (
-        <p className="hub-warning">資料尚未完成，不可對外引用</p>
-      )}
+      {entry.hasPlaceholder && <p className="hub-warning">資料尚未完成，不可對外引用</p>}
       {!entry.agentUsable && (
         <p className="hub-note">尚未核准，Agent 不得當成正式答案使用</p>
+      )}
+
+      <div className="field-actions">
+        <button type="button" className="ghost-button" onClick={() => setOpen(!open)}>
+          {open ? '收合內容' : '查看內容'}
+        </button>
+      </div>
+
+      {open && (
+        <div className="hub-detail">
+          {entry.type === 'faq' ? (
+            <>
+              <div className="dept-block">
+                <h4 className="dept-label">問題</h4>
+                <p className="dept-step-text">{entry.question}</p>
+              </div>
+              <div className="dept-block">
+                <h4 className="dept-label">標準答案</h4>
+                <p className="dept-step-text">{entry.answer}</p>
+              </div>
+            </>
+          ) : (
+            <div className="dept-block">
+              <h4 className="dept-label">政策內容</h4>
+              <p className="dept-step-text">{entry.policyContent}</p>
+            </div>
+          )}
+
+          <div className="dept-block">
+            <h4 className="dept-label">升級條件</h4>
+            <ul className="dept-list">
+              {entry.escalationConditions.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="dept-block">
+            <p className="dept-step-reason">
+              來源：{entry.source}　負責人：{entry.owner}
+            </p>
+            <p className="dept-step-reason">
+              生效日：{entry.effectiveDate}　下次檢視：{entry.nextReviewDate}
+            </p>
+          </div>
+        </div>
       )}
     </article>
   )
@@ -354,15 +415,19 @@ function HubCard({ entry }) {
 
 function KnowledgeHubSection() {
   const [query, setQuery] = useState('')
+  const [category, setCategory] = useState('全部')
   const keyword = query.trim().toLowerCase()
-  const match = (entry) =>
-    !keyword ||
-    [
+
+  const shown = knowledgeHub.filter((entry) => {
+    if (category !== '全部' && entry.category !== category) return false
+    if (!keyword) return true
+    return [
       entry.id,
       entry.title,
       entry.question,
       entry.answer,
       entry.policyContent,
+      entry.category,
       statusLabel(entry.status),
       riskLabel(entry.riskLevel),
       ...entry.tags,
@@ -371,85 +436,104 @@ function KnowledgeHubSection() {
       .join(' ')
       .toLowerCase()
       .includes(keyword)
+  })
 
-  const shownFaq = hubFaq.filter(match)
-  const shownPolicies = hubPolicies.filter(match)
-  const shown = shownFaq.length + shownPolicies.length
+  const metrics = [
+    { value: String(hubStats.total), label: '知識總數' },
+    { value: String(hubStats.approved), label: '已核准' },
+    { value: String(knowledgeHub.filter((e) => e.riskLevel === 'high').length), label: '高風險' },
+    { value: String(hubStats.withPlaceholder), label: '待補資料' },
+  ]
 
   return (
     <>
       <section className="card">
         <h2 className="card-title">Knowledge Hub</h2>
         <p className="group-note">{hubNote}</p>
+      </section>
 
+      <section className="card">
         <div className="field">
           <label className="field-label" htmlFor="hub-search">
-            搜尋
+            搜尋知識
           </label>
           <input
             id="hub-search"
             className="field-input"
             type="search"
-            placeholder="輸入編號、標題、內容、標籤或狀態，例如：POL-010、退款、高風險"
+            placeholder="搜尋標題、內容、標籤或知識 ID"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
           />
         </div>
-
-        <div className="dept-block">
-          <h4 className="dept-label">系統控制規則</h4>
-          <ul className="dept-list">
-            {hubRules.map((rule) => (
-              <li key={rule}>{rule}</li>
-            ))}
-          </ul>
+        <div className="hub-chips">
+          <button
+            type="button"
+            className={category === '全部' ? 'hub-chip is-on' : 'hub-chip'}
+            onClick={() => setCategory('全部')}
+          >
+            全部　{hubStats.total}
+          </button>
+          {hubCategoryStats.map((row) => (
+            <button
+              type="button"
+              key={row.name}
+              className={
+                (category === row.name ? 'hub-chip is-on' : 'hub-chip') +
+                (row.count === 0 ? ' is-empty' : '')
+              }
+              onClick={() => setCategory(row.name)}
+            >
+              {row.name}　{row.count}
+            </button>
+          ))}
         </div>
-        <p className="dept-step-reason">
-          共 {hubStats.total} 條（FAQ {hubStats.faq}、Policy {hubStats.policy}），
-          顯示 {shown} 條。
-          已核准 {hubStats.approved}、待審核 {hubStats.pending}、草稿 {hubStats.draft}。
-          可對外引用 {hubStats.quotable}、需人工審核 {hubStats.needsReview}、
-          內容含待填 {hubStats.withPlaceholder}。
-        </p>
+      </section>
+
+      <section className="card-group">
+        <div className="metric-grid">
+          {metrics.map((item) => (
+            <article className="card metric-card" key={item.label}>
+              <p className="metric-value">{item.value}</p>
+              <p className="metric-label">{item.label}</p>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="card-group">
         <h2 className="group-title">
-          FAQ　常見問題與標準答案（{shownFaq.length}）
+          {category === '全部' ? '全部知識' : category}（{shown.length}）
         </h2>
         <p className="group-note">
-          標準答案只供 Agent 草擬回覆，不代表 Agent 可以自動送出。
+          標準答案只供 Agent 草擬回覆，不代表 Agent 可以自動送出。核准前不得作為對外說法。
         </p>
-        {shownFaq.length ? (
+        {shown.length ? (
           <div className="dept-grid">
-            {shownFaq.map((entry) => (
+            {shown.map((entry) => (
               <HubCard entry={entry} key={entry.id} />
             ))}
           </div>
         ) : (
           <article className="card card-pending">
-            <p className="pending-text">沒有符合的 FAQ。</p>
+            <p className="pending-text">
+              {category === '回覆範本' || category === '統一用語'
+                ? '這一類尚未建立任何知識。'
+                : '沒有符合的知識。'}
+            </p>
           </article>
         )}
       </section>
 
-      <section className="card-group">
-        <h2 className="group-title">
-          SOP／Policies　政策與原則（{shownPolicies.length}）
-        </h2>
-        <p className="group-note">政策為內部規範，核准前不得作為對外說法。</p>
-        {shownPolicies.length ? (
-          <div className="dept-grid">
-            {shownPolicies.map((entry) => (
-              <HubCard entry={entry} key={entry.id} />
-            ))}
-          </div>
-        ) : (
-          <article className="card card-pending">
-            <p className="pending-text">沒有符合的政策。</p>
-          </article>
-        )}
+      <section className="card">
+        <h2 className="card-title">系統控制規則</h2>
+        <ul className="dept-list">
+          {hubRules.map((rule) => (
+            <li key={rule}>{rule}</li>
+          ))}
+        </ul>
       </section>
+
     </>
   )
 }
