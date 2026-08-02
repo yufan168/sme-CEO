@@ -11,12 +11,23 @@ import {
   hubCategoryStats,
   hubNote,
   hubRules,
-  hubStats,
-  knowledgeHub,
   riskLabel,
   statusLabel,
   summaryOf,
 } from './knowledgeHub.js'
+import {
+  approvalBlockers,
+  commitImport,
+  exportJson,
+  getEntries,
+  importTemplate,
+  localChangeCount,
+  resetAll,
+  resetEntry,
+  subscribeHub,
+  updateEntry,
+  validateImport,
+} from './hubStore.js'
 import { mockData, mockStats } from './mockData.js'
 import { programNote, programs } from './programs.js'
 import { workflows } from './workflows.js'
@@ -315,8 +326,215 @@ function buildEntries() {
   return entries
 }
 
+function download(name, text, mime) {
+  const blob = new Blob([text], { type: mime })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = name
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+function HubEditor({ entry, onClose }) {
+  const [form, setForm] = useState({
+    title: entry.title,
+    question: entry.question ?? '',
+    answer: entry.answer ?? '',
+    policyContent: entry.policyContent ?? '',
+    status: entry.status,
+    riskLevel: entry.riskLevel,
+    canQuoteExternally: entry.canQuoteExternally,
+    owner: entry.owner,
+    effectiveDate: entry.effectiveDate,
+    nextReviewDate: entry.nextReviewDate,
+  })
+  const set = (key, value) => setForm((prev) => ({ ...prev, [key]: value }))
+
+  const draftEntry = { ...entry, ...form }
+  const blockers = approvalBlockers(draftEntry)
+  const blocked = form.status === 'approved' && blockers.length > 0
+
+  return (
+    <div className="hub-detail hub-editor">
+      <div className="field">
+        <label className="field-label" htmlFor={'t-' + entry.id}>
+          標題
+        </label>
+        <input
+          id={'t-' + entry.id}
+          className="field-input"
+          value={form.title}
+          onChange={(e) => set('title', e.target.value)}
+        />
+      </div>
+
+      {entry.type === 'faq' ? (
+        <>
+          <div className="field">
+            <label className="field-label" htmlFor={'q-' + entry.id}>
+              問題
+            </label>
+            <input
+              id={'q-' + entry.id}
+              className="field-input"
+              value={form.question}
+              onChange={(e) => set('question', e.target.value)}
+            />
+          </div>
+          <div className="field">
+            <label className="field-label" htmlFor={'a-' + entry.id}>
+              標準答案
+            </label>
+            <textarea
+              id={'a-' + entry.id}
+              className="field-input hub-textarea"
+              rows={5}
+              value={form.answer}
+              onChange={(e) => set('answer', e.target.value)}
+            />
+          </div>
+        </>
+      ) : (
+        <div className="field">
+          <label className="field-label" htmlFor={'p-' + entry.id}>
+            政策內容
+          </label>
+          <textarea
+            id={'p-' + entry.id}
+            className="field-input hub-textarea"
+            rows={5}
+            value={form.policyContent}
+            onChange={(e) => set('policyContent', e.target.value)}
+          />
+        </div>
+      )}
+
+      <div className="hub-form-row">
+        <div className="field">
+          <label className="field-label" htmlFor={'s-' + entry.id}>
+            狀態
+          </label>
+          <select
+            id={'s-' + entry.id}
+            className="field-input"
+            value={form.status}
+            onChange={(e) => set('status', e.target.value)}
+          >
+            <option value="draft">草稿</option>
+            <option value="pending">待審核</option>
+            <option value="approved">已核准</option>
+            <option value="disabled">已停用</option>
+          </select>
+        </div>
+        <div className="field">
+          <label className="field-label" htmlFor={'r-' + entry.id}>
+            風險等級
+          </label>
+          <select
+            id={'r-' + entry.id}
+            className="field-input"
+            value={form.riskLevel}
+            onChange={(e) => set('riskLevel', e.target.value)}
+          >
+            <option value="low">低風險</option>
+            <option value="medium">中風險</option>
+            <option value="high">高風險</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="hub-form-row">
+        <div className="field">
+          <label className="field-label" htmlFor={'o-' + entry.id}>
+            知識負責人
+          </label>
+          <input
+            id={'o-' + entry.id}
+            className="field-input"
+            value={form.owner}
+            onChange={(e) => set('owner', e.target.value)}
+          />
+        </div>
+        <div className="field">
+          <label className="field-label" htmlFor={'e-' + entry.id}>
+            生效日
+          </label>
+          <input
+            id={'e-' + entry.id}
+            className="field-input"
+            value={form.effectiveDate}
+            onChange={(e) => set('effectiveDate', e.target.value)}
+          />
+        </div>
+        <div className="field">
+          <label className="field-label" htmlFor={'n-' + entry.id}>
+            下次檢視
+          </label>
+          <input
+            id={'n-' + entry.id}
+            className="field-input"
+            value={form.nextReviewDate}
+            onChange={(e) => set('nextReviewDate', e.target.value)}
+          />
+        </div>
+      </div>
+
+      <p className="hub-note">
+        <label>
+          <input
+            type="checkbox"
+            checked={form.canQuoteExternally}
+            disabled={approvalBlockers(draftEntry).includes('內容仍有待填欄位')}
+            onChange={(e) => set('canQuoteExternally', e.target.checked)}
+          />
+          　可對外引用
+          {approvalBlockers(draftEntry).includes('內容仍有待填欄位') &&
+            '（內容仍有待填欄位，規則不允許）'}
+        </label>
+      </p>
+
+      {blocked && (
+        <p className="hub-warning">
+          無法核准：{blockers.join('、')}。請先補齊再改為已核准。
+        </p>
+      )}
+
+      <div className="field-actions">
+        <button
+          type="button"
+          className="enter-button"
+          disabled={blocked}
+          onClick={() => {
+            updateEntry(entry.id, form)
+            onClose()
+          }}
+        >
+          儲存修正
+        </button>
+        <button type="button" className="ghost-button" onClick={onClose}>
+          取消
+        </button>
+        {(entry.edited || entry.imported) && (
+          <button
+            type="button"
+            className="ghost-button"
+            onClick={() => {
+              resetEntry(entry.id)
+              onClose()
+            }}
+          >
+            {entry.imported ? '刪除這筆匯入' : '還原這筆'}
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
 function HubCard({ entry }) {
   const [open, setOpen] = useState(false)
+  const [editing, setEditing] = useState(false)
 
   return (
     <article
@@ -326,6 +544,8 @@ function HubCard({ entry }) {
       <p className="hub-head">
         <span className="hub-id">{entry.id}</span>
         <span className="hub-cat">{entry.category}</span>
+        {entry.edited && <span className="hub-mark">已修正</span>}
+        {entry.imported && <span className="hub-mark">匯入</span>}
       </p>
 
       <h3 className="dept-name">{entry.title}</h3>
@@ -365,10 +585,29 @@ function HubCard({ entry }) {
       )}
 
       <div className="field-actions">
-        <button type="button" className="ghost-button" onClick={() => setOpen(!open)}>
+        <button
+          type="button"
+          className="ghost-button"
+          onClick={() => {
+            setOpen(!open)
+            setEditing(false)
+          }}
+        >
           {open ? '收合內容' : '查看內容'}
         </button>
+        <button
+          type="button"
+          className="ghost-button"
+          onClick={() => {
+            setEditing(!editing)
+            setOpen(false)
+          }}
+        >
+          {editing ? '取消修正' : '修正'}
+        </button>
       </div>
+
+      {editing && <HubEditor entry={entry} onClose={() => setEditing(false)} />}
 
       {open && (
         <div className="hub-detail">
@@ -413,12 +652,99 @@ function HubCard({ entry }) {
   )
 }
 
+function HubImport() {
+  const [result, setResult] = useState(null)
+
+  const onFile = (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    if (!file.name.toLowerCase().endsWith('.json')) {
+      setResult({ ok: false, errors: ['目前只接受 .json，請先下載範本再填。'] })
+      event.target.value = ''
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => {
+      setResult(validateImport(String(reader.result)))
+    }
+    reader.readAsText(file)
+    event.target.value = ''
+  }
+
+  return (
+    <section className="card">
+      <h2 className="card-title">上傳知識</h2>
+      <p className="group-note">
+        上傳的知識一律進入草稿、風險預設為高、不可對外引用、需人工審核。
+        檔案中若寫了已核准也不會生效，核准只能由人在畫面上按。
+      </p>
+
+      <div className="field">
+        <label className="field-label" htmlFor="hub-file">
+          選擇 JSON 檔
+        </label>
+        <input id="hub-file" className="field-input" type="file" accept=".json" onChange={onFile} />
+      </div>
+
+      <div className="field-actions">
+        <button
+          type="button"
+          className="ghost-button"
+          onClick={() => download('knowledge-template.json', importTemplate, 'application/json')}
+        >
+          下載範本
+        </button>
+      </div>
+
+      {result && !result.ok && (
+        <div className="dept-block">
+          <p className="hub-warning">檔案未通過檢查，整批未匯入。</p>
+          <ul className="dept-list">
+            {result.errors.slice(0, 10).map((err) => (
+              <li key={err}>{err}</li>
+            ))}
+          </ul>
+          {result.errors.length > 10 && (
+            <p className="dept-step-reason">另有 {result.errors.length - 10} 項問題未列出。</p>
+          )}
+        </div>
+      )}
+
+      {result && result.ok && (
+        <div className="dept-block">
+          <p className="dept-step-text">檢查通過，共 {result.count} 筆可匯入。</p>
+          <div className="field-actions">
+            <button
+              type="button"
+              className="enter-button"
+              onClick={() => {
+                commitImport(result.entries)
+                setResult(null)
+              }}
+            >
+              確認匯入 {result.count} 筆
+            </button>
+            <button type="button" className="ghost-button" onClick={() => setResult(null)}>
+              取消
+            </button>
+          </div>
+        </div>
+      )}
+    </section>
+  )
+}
+
 function KnowledgeHubSection() {
+  const [, tick] = useState(0)
+  useEffect(() => subscribeHub(() => tick((n) => n + 1)), [])
+
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('全部')
   const keyword = query.trim().toLowerCase()
+  const entries = getEntries()
+  const changes = localChangeCount()
 
-  const shown = knowledgeHub.filter((entry) => {
+  const shown = entries.filter((entry) => {
     if (category !== '全部' && entry.category !== category) return false
     if (!keyword) return true
     return [
@@ -439,18 +765,28 @@ function KnowledgeHubSection() {
   })
 
   const metrics = [
-    { value: String(hubStats.total), label: '知識總數' },
-    { value: String(hubStats.approved), label: '已核准' },
-    { value: String(knowledgeHub.filter((e) => e.riskLevel === 'high').length), label: '高風險' },
-    { value: String(hubStats.withPlaceholder), label: '待補資料' },
+    { value: String(entries.length), label: '知識總數' },
+    { value: String(entries.filter((e) => e.status === 'approved').length), label: '已核准' },
+    { value: String(entries.filter((e) => e.riskLevel === 'high').length), label: '高風險' },
+    { value: String(entries.filter((e) => e.hasPlaceholder).length), label: '待補資料' },
   ]
+
+  const catCount = (name) => entries.filter((e) => e.category === name).length
 
   return (
     <>
       <section className="card">
         <h2 className="card-title">Knowledge Hub</h2>
         <p className="group-note">{hubNote}</p>
+        {(changes.edited > 0 || changes.imported > 0) && (
+          <p className="hub-warning">
+            本機有未帶回專案的變更：修正 {changes.edited} 筆、匯入 {changes.imported} 筆。
+            這些只存在這台瀏覽器，換裝置或清快取就會消失，請用下方「匯出 JSON」帶回專案。
+          </p>
+        )}
       </section>
+
+      <HubImport />
 
       <section className="card">
         <div className="field">
@@ -472,7 +808,7 @@ function KnowledgeHubSection() {
             className={category === '全部' ? 'hub-chip is-on' : 'hub-chip'}
             onClick={() => setCategory('全部')}
           >
-            全部　{hubStats.total}
+            全部　{entries.length}
           </button>
           {hubCategoryStats.map((row) => (
             <button
@@ -480,13 +816,35 @@ function KnowledgeHubSection() {
               key={row.name}
               className={
                 (category === row.name ? 'hub-chip is-on' : 'hub-chip') +
-                (row.count === 0 ? ' is-empty' : '')
+                (catCount(row.name) === 0 ? ' is-empty' : '')
               }
               onClick={() => setCategory(row.name)}
             >
-              {row.name}　{row.count}
+              {row.name}　{catCount(row.name)}
             </button>
           ))}
+        </div>
+        <div className="field-actions">
+          <button
+            type="button"
+            className="ghost-button"
+            onClick={() =>
+              download('knowledge-hub.json', exportJson(), 'application/json')
+            }
+          >
+            匯出 JSON
+          </button>
+          <button
+            type="button"
+            className="ghost-button"
+            onClick={() => {
+              if (window.confirm('確定要清除本機的所有修正與匯入嗎？此動作無法復原。')) {
+                resetAll()
+              }
+            }}
+          >
+            清除本機變更
+          </button>
         </div>
       </section>
 

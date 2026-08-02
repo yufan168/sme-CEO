@@ -96,7 +96,7 @@ export function canAgentSend() {
   return false
 }
 
-function normalizeEntry(raw) {
+export function normalizeEntry(raw) {
   const matched = matchedEscalationKeywords(raw)
   const placeholder = hasContentPlaceholder(raw)
 

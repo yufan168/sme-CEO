@@ -1202,3 +1202,33 @@ body {
   padding-top: 12px;
   border-top: 1px solid var(--line-soft);
 }
+
+.hub-mark {
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: var(--brand-gold-soft);
+  color: #5c4219;
+  font-size: 12px;
+}
+
+.hub-editor {
+  background: var(--warm-white);
+  padding: 12px;
+  border-radius: 4px;
+}
+
+.hub-textarea {
+  font: inherit;
+  resize: vertical;
+}
+
+.hub-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.hub-form-row .field {
+  flex: 1 1 160px;
+  min-width: 0;
+}
