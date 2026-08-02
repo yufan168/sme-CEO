@@ -1,4 +1,5 @@
 import { departments } from './departments.js'
+import { ReviewRulesSection } from './governanceSections.jsx'
 import { authority, authorityNote } from './authority.js'
 import {
   businessLines,
@@ -1017,6 +1018,17 @@ function WorkflowRunner({ flow }) {
                   <span>{record.basis.join('、')}</span>
                 </p>
               )}
+              {record.risk && (
+                <p className="dept-role">
+                  <span className="dept-role-name">風險分級</span>
+                  <span>
+                    <span className={`gov-level gov-level-${record.risk.level}`}>
+                      {record.risk.level}
+                    </span>
+                    {record.risk.reason}
+                  </span>
+                </p>
+              )}
               {record.output && <pre className="run-output">{record.output}</pre>}
               {record.error && <p className="run-error">失敗原因：{record.error}</p>}
               {record.rejectedNote && (
@@ -1117,6 +1129,8 @@ export function ReviewCenterPage({ onNavigate }) {
           </div>
         )}
       </section>
+
+      <ReviewRulesSection />
     </>
   )
 }

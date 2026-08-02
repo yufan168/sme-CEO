@@ -1263,3 +1263,136 @@ body {
   background: #f0eeec;
   color: #9c9490;
 }
+
+/* 治理規則：權限矩陣與風險分級 */
+.gov-principle {
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  border-left: 4px solid var(--brand-gold);
+  background: var(--cream);
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+.gov-role-title {
+  margin-left: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.gov-table-wrap {
+  overflow-x: auto;
+  margin: 8px 0;
+}
+
+.gov-table {
+  width: 100%;
+  min-width: 420px;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.gov-table th,
+.gov-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--line-soft);
+  text-align: left;
+  vertical-align: top;
+  line-height: 1.6;
+}
+
+.gov-table th {
+  background: var(--cream);
+  border-bottom: 1px solid var(--line);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.gov-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.gov-yes {
+  color: #1f6b3a;
+  font-weight: 600;
+}
+
+.gov-no {
+  color: #9c3a2b;
+}
+
+.gov-cond {
+  color: #8a6410;
+}
+
+.gov-deny li {
+  color: #8a3a2b;
+}
+
+.gov-redline li {
+  padding: 6px 0;
+  font-weight: 600;
+}
+
+.gov-words {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.9;
+  word-break: break-word;
+}
+
+.gov-level {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 1px 8px;
+  border-radius: 3px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.gov-level-L3 {
+  background: #fbe6e2;
+  color: #9c3a2b;
+}
+
+.gov-level-L2 {
+  background: var(--brand-gold-soft);
+  color: #7a5806;
+}
+
+.gov-level-L1 {
+  background: #e6f3ea;
+  color: #1f6b3a;
+}
+
+.gov-input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  line-height: 1.7;
+  resize: vertical;
+}
+
+.gov-check {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 10px 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* 表格與長字串不得把版面撐寬：grid 子項預設 min-width auto 會擋住收縮 */
+.dept-card,
+.gov-table-wrap {
+  min-width: 0;
+  max-width: 100%;
+}
