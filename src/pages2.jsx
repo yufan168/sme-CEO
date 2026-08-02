@@ -353,11 +353,49 @@ function HubCard({ entry }) {
 }
 
 function KnowledgeHubSection() {
+  const [query, setQuery] = useState('')
+  const keyword = query.trim().toLowerCase()
+  const match = (entry) =>
+    !keyword ||
+    [
+      entry.id,
+      entry.title,
+      entry.question,
+      entry.answer,
+      entry.policyContent,
+      statusLabel(entry.status),
+      riskLabel(entry.riskLevel),
+      ...entry.tags,
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase()
+      .includes(keyword)
+
+  const shownFaq = hubFaq.filter(match)
+  const shownPolicies = hubPolicies.filter(match)
+  const shown = shownFaq.length + shownPolicies.length
+
   return (
     <>
       <section className="card">
         <h2 className="card-title">Knowledge Hub</h2>
         <p className="group-note">{hubNote}</p>
+
+        <div className="field">
+          <label className="field-label" htmlFor="hub-search">
+            搜尋
+          </label>
+          <input
+            id="hub-search"
+            className="field-input"
+            type="search"
+            placeholder="輸入編號、標題、內容、標籤或狀態，例如：POL-010、退款、高風險"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+        </div>
+
         <div className="dept-block">
           <h4 className="dept-label">系統控制規則</h4>
           <ul className="dept-list">
@@ -367,7 +405,8 @@ function KnowledgeHubSection() {
           </ul>
         </div>
         <p className="dept-step-reason">
-          共 {hubStats.total} 條（FAQ {hubStats.faq}、Policy {hubStats.policy}）。
+          共 {hubStats.total} 條（FAQ {hubStats.faq}、Policy {hubStats.policy}），
+          顯示 {shown} 條。
           已核准 {hubStats.approved}、待審核 {hubStats.pending}、草稿 {hubStats.draft}。
           可對外引用 {hubStats.quotable}、需人工審核 {hubStats.needsReview}、
           內容含待填 {hubStats.withPlaceholder}。
@@ -375,25 +414,41 @@ function KnowledgeHubSection() {
       </section>
 
       <section className="card-group">
-        <h2 className="group-title">FAQ　常見問題與標準答案</h2>
+        <h2 className="group-title">
+          FAQ　常見問題與標準答案（{shownFaq.length}）
+        </h2>
         <p className="group-note">
           標準答案只供 Agent 草擬回覆，不代表 Agent 可以自動送出。
         </p>
-        <div className="dept-grid">
-          {hubFaq.map((entry) => (
-            <HubCard entry={entry} key={entry.id} />
-          ))}
-        </div>
+        {shownFaq.length ? (
+          <div className="dept-grid">
+            {shownFaq.map((entry) => (
+              <HubCard entry={entry} key={entry.id} />
+            ))}
+          </div>
+        ) : (
+          <article className="card card-pending">
+            <p className="pending-text">沒有符合的 FAQ。</p>
+          </article>
+        )}
       </section>
 
       <section className="card-group">
-        <h2 className="group-title">SOP／Policies　政策與原則</h2>
+        <h2 className="group-title">
+          SOP／Policies　政策與原則（{shownPolicies.length}）
+        </h2>
         <p className="group-note">政策為內部規範，核准前不得作為對外說法。</p>
-        <div className="dept-grid">
-          {hubPolicies.map((entry) => (
-            <HubCard entry={entry} key={entry.id} />
-          ))}
-        </div>
+        {shownPolicies.length ? (
+          <div className="dept-grid">
+            {shownPolicies.map((entry) => (
+              <HubCard entry={entry} key={entry.id} />
+            ))}
+          </div>
+        ) : (
+          <article className="card card-pending">
+            <p className="pending-text">沒有符合的政策。</p>
+          </article>
+        )}
       </section>
     </>
   )
