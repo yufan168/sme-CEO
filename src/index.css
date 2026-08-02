@@ -1511,3 +1511,81 @@ body {
 .gov-deny-text {
   color: #8a3a2b;
 }
+
+/* 綁定 AI 員工 */
+.bind-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.bind-chip {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  max-width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper);
+  cursor: pointer;
+  line-height: 1.5;
+}
+
+.bind-chip:hover {
+  border-color: var(--brand-gold);
+}
+
+.bind-chip.is-off {
+  background: var(--warm-white);
+  border-style: dashed;
+  color: var(--muted);
+}
+
+.bind-chip.is-locked {
+  background: var(--cream);
+  border-color: var(--line-soft);
+  cursor: default;
+}
+
+.bind-chip.is-locked:hover {
+  border-color: var(--line-soft);
+}
+
+.bind-order {
+  flex: none;
+  min-width: 20px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: right;
+}
+
+.bind-lock {
+  flex: none;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--line-soft);
+  color: var(--brand-brown-mid);
+  font-size: 12px;
+}
+
+.bind-name {
+  min-width: 0;
+  font-size: 14px;
+}
+
+.bind-id {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.run-skipped {
+  margin: 6px 0 0;
+  padding: 6px 10px;
+  border-left: 3px solid var(--line);
+  background: var(--warm-white);
+  color: var(--muted);
+  line-height: 1.7;
+}

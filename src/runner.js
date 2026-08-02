@@ -3,6 +3,7 @@ import { callAI } from './callAI.js'
 import { MOCK_LABEL, findMock } from './mockData.js'
 import { buildProgramBrief } from './programs.js'
 import { classifyRisk, outputContractGaps } from './governance.js'
+import { isNodeEnabled } from './agentBinding.js'
 
 // 通用執行器：只讀 Workflow 定義，不寫死任何流程順序。
 // 換一份定義就能執行另一條流程，不需要修改這個檔案。
@@ -172,6 +173,18 @@ export async function runWorkflow(workflow, run, onUpdate, startId) {
     }
 
     if (current.executor === 'agent') {
+      // 被取消勾選的 Agent 節點不執行，但要明白標示，不能靜默消失。
+      if (!isNodeEnabled(workflow.id, current.id)) {
+        run.nodes[current.id] = {
+          status: 'skipped',
+          summary: '已停用，本次不執行',
+          skippedReason: `「${current.name}」已於綁定 AI 員工中取消勾選。`,
+        }
+        onUpdate({ ...run })
+        current = current.next ? findNode(workflow, current.next) : null
+        continue
+      }
+
       run.nodes[current.id] = { status: 'running' }
       run.currentNodeId = current.id
       onUpdate({ ...run })
