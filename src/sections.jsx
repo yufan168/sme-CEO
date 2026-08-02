@@ -1,6 +1,7 @@
 import { departments } from './departments.js'
 import { ReviewRulesSection } from './governanceSections.jsx'
 import { AgentBindingPanel } from './agentBindingPanel.jsx'
+import { BrandExportPanel } from './brandExportPanel.jsx'
 import { authority, authorityNote } from './authority.js'
 import {
   businessLines,
@@ -83,6 +84,8 @@ export function HomePage({ onNavigate }) {
           </div>
         </dl>
       </section>
+
+      <BrandExportPanel />
     </>
   )
 }
