@@ -1245,3 +1245,21 @@ body {
   color: #8c3a2b;
   font-size: 12px;
 }
+
+.hub-detail-panel {
+  border-left: 4px solid var(--brand-gold);
+}
+
+.hub-content {
+  white-space: pre-wrap;
+}
+
+.hub-status-published {
+  background: #e6f3ea;
+  color: #1f6b3a;
+}
+
+.hub-status-archived {
+  background: #f0eeec;
+  color: #9c9490;
+}
