@@ -1,14 +1,44 @@
 // Agent 示範資料（Mock Data）。
 // 用途：AI 員工頁的情境範例、Workflow 示範模式的備援輸出、測試與課堂展示。
-// 全部為虛構示範，不代表真實客戶、金額或承諾。
+//
+// 隔離規則（由 normalizeMock() 強制寫進每一筆資料，不靠檔頭一句聲明）：
+//   mode: 'demo'              永遠是示範模式
+//   isFictional: true         全部虛構，不代表真實客戶、金額或承諾
+//   companyData: false        不是享洺的公司資料
+//   canSendExternally: false  不得對外送出
+//   allowKnowledgeRetrieval: false  不得進入正式知識檢索
+// 這五個旗標寫在每一筆上，離開這個檔案也認得出來。
+
+export const MOCK_LABEL = '【示範資料，非享洺真實數據】'
 
 export const mockNote =
   '每位 Agent 三筆示範情境。輸入情境可作為節點輸入，預期輸出可作為示範內容或驗收依據。資料均為虛構，不代表真實客戶、金額或承諾。'
 
+export const mockIsolationNote =
+  '示範資料不得進入正式知識檢索、不得寫回 CRM 或財務、不得出現在正式營運數字、不得對外送出。示範模式與真實模式不得混用。'
+
+// 每一筆都強制帶上隔離旗標，並在每個情境前加註示範標記。
+function normalizeMock(row) {
+  return {
+    ...row,
+    mode: 'demo',
+    isFictional: true,
+    companyData: false,
+    canSendExternally: false,
+    allowKnowledgeRetrieval: false,
+    cases: row.cases.map((item) => ({
+      ...item,
+      label: MOCK_LABEL,
+      input: item.input.startsWith(MOCK_LABEL) ? item.input : MOCK_LABEL + item.input,
+      output: item.output.startsWith(MOCK_LABEL) ? item.output : MOCK_LABEL + item.output,
+    })),
+  }
+}
+
 export const mockSourceNote =
   '標示為負責人提供者來自上傳的知識庫檔案，逐字收錄未經改寫；標示為系統補寫者為制度與認證輔導部、永續與碳管理部兩個新部門依同一格式補齊，內容待負責人確認。'
 
-export const mockData = [
+const rawMockData = [
   {
     "agentId": "S01",
     "agentName": "經營資料整理員",
@@ -920,6 +950,8 @@ export const mockData = [
     ]
   }
 ]
+
+export const mockData = rawMockData.map(normalizeMock)
 
 export function findMock(agentId) {
   return mockData.find((row) => row.agentId === agentId) ?? null

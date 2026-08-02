@@ -28,7 +28,7 @@ import {
   updateEntry,
   validateImport,
 } from './hubStore.js'
-import { mockData, mockStats } from './mockData.js'
+import { mockData, mockIsolationNote, mockStats } from './mockData.js'
 import { programNote, programs } from './programs.js'
 import { workflows } from './workflows.js'
 import { hasApiKey } from './aiSettings.js'
@@ -320,6 +320,7 @@ function buildEntries() {
         page: 'ai-staff',
         anchor: 'agent-' + row.agentId,
         jump: '前往 Agent',
+        demo: true,
       })
     })
   })
@@ -918,6 +919,7 @@ export function KnowledgePage({ onNavigate }) {
           外部文件、教材與計畫 know-how 需要接上儲存來源才能收錄，本版尚未接入。
         </p>
         <p className="dept-step-reason">{programNote}</p>
+        <p className="hub-warning">{mockIsolationNote}</p>
         <div className="field">
           <label className="field-label" htmlFor="kb-search">
             搜尋
@@ -939,9 +941,15 @@ export function KnowledgePage({ onNavigate }) {
       <section className="card-group">
         <div className="dept-grid">
           {shown.map((entry) => (
-            <article className="card dept-card" key={entry.id}>
+            <article
+              className={entry.demo ? 'card dept-card is-demo' : 'card dept-card'}
+              key={entry.id}
+            >
               <h3 className="dept-name">{entry.title}</h3>
-              <p className="agent-type">{entry.kind}</p>
+              <p className="agent-type">
+                {entry.kind}
+                {entry.demo && <span className="demo-badge">示範資料</span>}
+              </p>
               {entry.body && <p className="dept-duty">{entry.body}</p>}
               {entry.extra && <p className="dept-step-reason">{entry.extra}</p>}
               {entry.page && (

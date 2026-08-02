@@ -1232,3 +1232,16 @@ body {
   flex: 1 1 160px;
   min-width: 0;
 }
+
+.dept-card.is-demo {
+  border-left: 4px solid var(--brand-gold-soft);
+}
+
+.demo-badge {
+  margin-left: 8px;
+  padding: 1px 7px;
+  border: 1px solid #d8b6ae;
+  border-radius: 3px;
+  color: #8c3a2b;
+  font-size: 12px;
+}
