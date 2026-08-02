@@ -16,6 +16,7 @@ import {
   PermissionPage,
   AutomationPage,
 } from './pages2.jsx'
+import { GovernanceCenterPage } from './governanceCenter.jsx'
 
 const pages = [
   { id: 'home', label: '公司首頁', ready: true, render: HomePage },
@@ -27,6 +28,7 @@ const pages = [
   { id: 'knowledge', label: '知識庫', ready: true, render: KnowledgePage },
   { id: 'review', label: '審核中心', ready: true, render: ReviewCenterPage },
   { id: 'permission', label: '權限', ready: true, render: PermissionPage },
+  { id: 'governance', label: '治理中心', ready: true, render: GovernanceCenterPage },
   { id: 'automation', label: '自動化', ready: true, render: AutomationPage },
   { id: 'ai-settings', label: 'AI 設定', ready: true, render: AiSettingsPage, group: 'settings' },
 ]

@@ -1165,6 +1165,7 @@ function normalizeCard(raw) {
     canQuoteExternally,
     requiresHumanReview: raw.requiresHumanReview ?? (sensitive.length > 0 || !allowAIUse),
     sensitiveHits: sensitive,
+    hasPlaceholderContent: placeholder,
   }
 }
 
