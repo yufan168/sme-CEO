@@ -1,5 +1,7 @@
 import { hasApiKey } from './aiSettings.js'
 import { callAI } from './callAI.js'
+import { MOCK_LABEL, findMock } from './mockData.js'
+import { buildProgramBrief } from './programs.js'
 
 // 通用執行器：只讀 Workflow 定義，不寫死任何流程順序。
 // 換一份定義就能執行另一條流程，不需要修改這個檔案。
@@ -7,7 +9,7 @@ import { callAI } from './callAI.js'
 export const companyContext = [
   '公司名稱：享洺有限公司',
   '產業：企業管理顧問',
-  '成立年份：2023 年',
+  '成立年份：2021 年',
   '規模：5 人以下',
   '主要業務：企業管理顧問、政府計畫輔導',
   '負責人：SUSU',
@@ -57,6 +59,12 @@ function buildPrompt(workflow, node, previous) {
     ? previous.map((item) => `【${item.name} 的產出】\n${item.output}`).join('\n\n')
     : '（本節點為流程中第一個 Agent，沒有前置產出）'
 
+  // 節點宣告 knowledge 時帶入政府計畫條件，讓 Agent 有事實可依據。
+  const brief = buildProgramBrief(node.knowledge)
+  const knowledgeText = brief
+    ? ['', '參考資料（只能引用，不得推翻或自行補充）：', brief].join('\n')
+    : ''
+
   const userPrompt = [
     `本次流程目標：${workflow.goal}`,
     '',
@@ -64,6 +72,7 @@ function buildPrompt(workflow, node, previous) {
     '',
     '前置節點產出：',
     previousText,
+    knowledgeText,
     '',
     '請依下列格式輸出，每一項各自成段：',
     node.outputContract.map((item) => `【${item}】`).join('\n'),
@@ -79,12 +88,33 @@ async function executeAgentNode(workflow, run, node) {
     : ['公司基本資料']
 
   if (!hasApiKey()) {
+    if (node.demoOutput) {
+      return {
+        status: 'completed',
+        mode: 'demo',
+        summary: node.demoOutput.summary,
+        basis: node.demoOutput.basis,
+        output: node.demoOutput.result,
+      }
+    }
+    // 節點未附示範產出時，退回使用該 Agent 的示範資料，流程不中斷。
+    // 示範資料一律標明來源，不得看起來像真實營運數字。
+    const mock = findMock(node.agentId)
+    if (mock) {
+      return {
+        status: 'completed',
+        mode: 'demo',
+        summary: mock.cases[0].title,
+        basis: [MOCK_LABEL + 'Agent 示範資料 ' + mock.cases[0].id],
+        output: mock.cases
+          .map((item) => `【${item.id}　${item.title}】\n輸入：${item.input}\n輸出：${item.output}`)
+          .join('\n\n'),
+      }
+    }
     return {
-      status: 'completed',
+      status: 'failed',
       mode: 'demo',
-      summary: node.demoOutput.summary,
-      basis: node.demoOutput.basis,
-      output: node.demoOutput.result,
+      error: `節點 ${node.name} 沒有示範產出，${node.agentId} 也沒有示範資料。`,
     }
   }
 

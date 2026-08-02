@@ -7,6 +7,20 @@ import {
 } from './agentBlueprint.js'
 import { authority, authorityNote } from './authority.js'
 import { businessLines, caseLifecycle, channels } from './businessLines.js'
+import {
+  categories,
+  categoryLabel,
+  countByCategory,
+  filterKnowledgeCards,
+  hasPlaceholder,
+  hubIntro,
+  knowledgeCards,
+  levelLabels,
+  renderKnowledgeStats,
+  statusLabels,
+} from './knowledgeCards.js'
+import { mockData, mockIsolationNote, mockStats } from './mockData.js'
+import { programNote, programs } from './programs.js'
 import { workflows } from './workflows.js'
 import { hasApiKey } from './aiSettings.js'
 import { listWaiting, subscribe } from './runStore.js'
@@ -71,6 +85,11 @@ export function WarRoomPage({ onNavigate }) {
       value: connected ? '已接' : '未接',
       note: connected ? '執行時呼叫真實模型' : '執行時使用示範內容',
     },
+    {
+      label: '示範資料',
+      value: String(mockStats.cases),
+      note: `涵蓋 ${mockStats.agents} 位 Agent`,
+    },
   ]
 
   return (
@@ -133,7 +152,15 @@ export function WarRoomPage({ onNavigate }) {
                 if (!flow || !node) return null
                 return (
                   <div className="dept-step" key={item.workflowId}>
-                    <p className="dept-step-name">{flow.name}</p>
+                    <p className="dept-step-name">
+                      <button
+                        type="button"
+                        className="jump-link"
+                        onClick={() => onNavigate('workflow', 'flow-' + flow.id)}
+                      >
+                        {flow.name}
+                      </button>
+                    </p>
                     <p className="dept-step-text">
                       停在：{node.name}　{node.waitingMessage}
                     </p>
@@ -166,7 +193,7 @@ export function WarRoomPage({ onNavigate }) {
             ))}
           </p>
           <p className="dept-step-reason">
-            五條業務線共用同一條。每一關的人工責任見部門分頁。
+            七條業務線共用同一條。每一關的人工責任見部門分頁。
           </p>
         </article>
       </section>
@@ -183,6 +210,9 @@ function buildEntries() {
       kind: '部門流程',
       body: dept.flow.join(' → '),
       extra: '人工閘門：' + (dept.gateChain ?? ''),
+      page: 'ai-staff',
+      anchor: 'dept-' + dept.department,
+      jump: '前往部門',
     })
     dept.agents.forEach((agent) => {
       entries.push({
@@ -191,16 +221,22 @@ function buildEntries() {
         kind: dept.department,
         body: agent.duty,
         extra: '工作邊界：' + agent.limit,
+        page: 'ai-staff',
+        anchor: 'agent-' + agent.id,
+        jump: '前往 Agent',
       })
     })
   })
   workflows.forEach((flow) => {
     entries.push({
       id: 'flow-' + flow.id,
-      title: flow.name,
+      title: flow.code + '　' + flow.name,
       kind: '工作流程',
       body: flow.goal,
       extra: flow.keyRule ? flow.keyRule.title + '：' + flow.keyRule.text : flow.shape,
+      page: 'workflow',
+      anchor: 'flow-' + flow.id,
+      jump: '前往流程',
     })
   })
   businessLines.forEach((line) => {
@@ -221,10 +257,279 @@ function buildEntries() {
       extra: '歸屬：' + ch.dept,
     })
   })
+  programs.forEach((program) => {
+    entries.push({
+      id: 'program-' + program.id,
+      title: program.code + '　' + program.name,
+      kind: '政府計畫',
+      body: program.background,
+      extra: `主管機關：${program.authority}｜適用對象：${program.target}`,
+    })
+    program.stages.forEach((stage) => {
+      entries.push({
+        id: 'program-' + program.id + '-' + stage.code,
+        title: `${program.name}　${stage.code} ${stage.name}`,
+        kind: '政府計畫階段',
+        body: stage.summary + '　' + stage.money.join('；'),
+        extra: stage.note,
+      })
+    })
+    entries.push({
+      id: 'program-' + program.id + '-eligibility',
+      title: program.name + '　申請資格',
+      kind: '政府計畫資格',
+      body: program.eligibility.join('；'),
+      extra: '不得申請：' + program.excluded.join('；'),
+    })
+    if (program.ratioChecks.length) {
+      entries.push({
+        id: 'program-' + program.id + '-ratio',
+        title: program.name + '　經費比例上限',
+        kind: '政府計畫核銷',
+        body: program.ratioChecks
+          .map((row) => `${row.item} 不得超過${row.base}之 ${row.limit}%`)
+          .join('；'),
+        extra: program.accounting.join('；'),
+      })
+    }
+    entries.push({
+      id: 'program-' + program.id + '-deadline',
+      title: program.name + '　期限與罰則',
+      kind: '政府計畫期限',
+      body: program.deadlines.map((row) => `${row.item}：${row.rule}`).join('；'),
+      extra: '罰則：' + program.penalty,
+    })
+  })
+  mockData.forEach((row) => {
+    row.cases.forEach((item) => {
+      entries.push({
+        id: 'mock-' + item.id,
+        title: `${item.id}　${item.title}`,
+        kind: `示範情境｜${row.agentId} ${row.agentName}`,
+        body: '輸入：' + item.input,
+        extra: '輸出：' + item.output,
+        page: 'ai-staff',
+        anchor: 'agent-' + row.agentId,
+        jump: '前往 Agent',
+        demo: true,
+      })
+    })
+  })
   return entries
 }
 
-export function KnowledgePage() {
+function MetaRow({ label, value }) {
+  return (
+    <p className="dept-role">
+      <span className="dept-role-name">{label}</span>
+      <span>{value}</span>
+    </p>
+  )
+}
+
+function KnowledgeDetail({ card, onClose }) {
+  const draft = card.status === 'Draft'
+  const incomplete = hasPlaceholder(card)
+
+  return (
+    <section className="card hub-detail-panel">
+      <div className="field-actions">
+        <button type="button" className="ghost-button" onClick={onClose}>
+          返回清單
+        </button>
+      </div>
+
+      <p className="hub-head">
+        <span className="hub-id">{card.id}</span>
+        <span className="hub-cat">{categoryLabel(card.category)}</span>
+      </p>
+      <h2 className="card-title">{card.title}</h2>
+
+      {draft && <p className="hub-warning">草稿，不可作為正式知識</p>}
+      {incomplete && <p className="hub-warning">資料尚未完成</p>}
+
+      <p className="hub-tags">
+        {card.tags.map((tag) => (
+          <span className="hub-tag" key={tag}>
+            #{tag}
+          </span>
+        ))}
+      </p>
+
+      <div className="dept-block">
+        <h4 className="dept-label">摘要</h4>
+        <p className="dept-step-text">{card.summary}</p>
+      </div>
+
+      <div className="dept-block">
+        <h4 className="dept-label">完整內容</h4>
+        <p className="dept-step-text hub-content">{card.content}</p>
+      </div>
+
+      <div className="dept-block">
+        <h4 className="dept-label">維護資訊</h4>
+        <MetaRow label="維護部門" value={card.owner} />
+        <MetaRow
+          label="適用 Agent"
+          value={card.appliesTo.join('、')}
+        />
+        <MetaRow label="可見範圍" value={card.visibility} />
+        <MetaRow label="優先級" value={levelLabels[card.priority]} />
+        <MetaRow label="狀態" value={statusLabels[card.status]} />
+        <MetaRow label="可信度" value={levelLabels[card.confidence]} />
+      </div>
+
+      <div className="dept-block">
+        <h4 className="dept-label">版本與期間</h4>
+        <MetaRow label="版本" value={card.version} />
+        <MetaRow label="生效日期" value={card.validFrom} />
+        <MetaRow label="到期日期" value={card.validUntil || '無期限'} />
+        <MetaRow label="最後更新" value={card.lastUpdated} />
+        <MetaRow label="審核人" value={card.reviewer} />
+      </div>
+
+      <div className="dept-block">
+        <h4 className="dept-label">關聯知識</h4>
+        <p className="dept-step-text">
+          {card.relatedCards.length ? card.relatedCards.join('、') : '無'}
+        </p>
+      </div>
+    </section>
+  )
+}
+
+function KnowledgeCardItem({ card, onOpen }) {
+  const draft = card.status === 'Draft'
+  const incomplete = hasPlaceholder(card)
+
+  return (
+    <article
+      className={draft ? 'card hub-card is-unapproved' : 'card hub-card'}
+      id={'hub-' + card.id}
+    >
+      <p className="hub-head">
+        <span className="hub-id">{card.id}</span>
+        <span className="hub-cat">{categoryLabel(card.category)}</span>
+      </p>
+
+      <h3 className="dept-name">{card.title}</h3>
+      <p className="dept-duty">{card.summary}</p>
+
+      <p className="hub-tags">
+        {card.tags.map((tag) => (
+          <span className="hub-tag" key={tag}>
+            #{tag}
+          </span>
+        ))}
+      </p>
+
+      <p className="hub-badges">
+        <span className={'hub-risk hub-risk-' + card.priority.toLowerCase()}>
+          優先級：{levelLabels[card.priority]}
+        </span>
+        <span className={'hub-status hub-status-' + card.status.toLowerCase()}>
+          {statusLabels[card.status]}
+        </span>
+        <span className="hub-meta">v{card.version}</span>
+        <span className="hub-meta">更新 {card.lastUpdated}</span>
+      </p>
+
+      {draft && <p className="hub-warning">草稿，不可作為正式知識</p>}
+      {incomplete && <p className="hub-note">資料尚未完成</p>}
+
+      <div className="field-actions">
+        <button type="button" className="ghost-button" onClick={() => onOpen(card.id)}>
+          查看內容
+        </button>
+      </div>
+    </article>
+  )
+}
+
+function KnowledgeHubSection() {
+  const [query, setQuery] = useState('')
+  const [category, setCategory] = useState('All')
+  const [openId, setOpenId] = useState(null)
+
+  const shown = filterKnowledgeCards(knowledgeCards, category, query)
+  const stats = renderKnowledgeStats(knowledgeCards)
+  const current = openId ? knowledgeCards.find((card) => card.id === openId) : null
+
+  const openKnowledgeDetail = (id) => setOpenId(id)
+  const closeKnowledgeDetail = () => setOpenId(null)
+
+  return (
+    <>
+      <section className="card">
+        <h2 className="card-title">Knowledge Hub</h2>
+        <p className="group-note">{hubIntro}</p>
+      </section>
+
+      <section className="card-group">
+        <div className="metric-grid">
+          {stats.map((item) => (
+            <article className="card metric-card" key={item.label}>
+              <p className="metric-value">{item.value}</p>
+              <p className="metric-label">{item.label}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="card">
+        <div className="field">
+          <label className="field-label" htmlFor="hub-search">
+            搜尋知識
+          </label>
+          <input
+            id="hub-search"
+            className="field-input"
+            type="search"
+            placeholder="搜尋標題、內容、標籤或知識 ID"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+        </div>
+        <div className="hub-chips">
+          {categories.map((item) => (
+            <button
+              type="button"
+              key={item.value}
+              className={
+                (category === item.value ? 'hub-chip is-on' : 'hub-chip') +
+                (countByCategory(item.value) === 0 ? ' is-empty' : '')
+              }
+              onClick={() => setCategory(item.value)}
+            >
+              {item.label}　{countByCategory(item.value)}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {current && <KnowledgeDetail card={current} onClose={closeKnowledgeDetail} />}
+
+      <section className="card-group">
+        <h2 className="group-title">
+          {categoryLabel(category === 'All' ? 'All' : category)}（{shown.length}）
+        </h2>
+        {shown.length ? (
+          <div className="dept-grid">
+            {shown.map((card) => (
+              <KnowledgeCardItem card={card} key={card.id} onOpen={openKnowledgeDetail} />
+            ))}
+          </div>
+        ) : (
+          <article className="card card-pending">
+            <p className="pending-text">找不到符合條件的知識</p>
+          </article>
+        )}
+      </section>
+    </>
+  )
+}
+
+export function KnowledgePage({ onNavigate }) {
   const [query, setQuery] = useState('')
   const entries = useMemo(buildEntries, [])
   const keyword = query.trim()
@@ -236,12 +541,17 @@ export function KnowledgePage() {
 
   return (
     <>
+      <KnowledgeHubSection />
+
       <section className="card">
-        <h2 className="card-title">知識庫</h2>
+        <h2 className="card-title">系統設定條目</h2>
         <p className="group-note">
-          目前收錄的是系統本身的設定：部門流程、Agent 職責與邊界、工作流程的關鍵控制條件、
-          業務線與接觸管道。外部文件、教材與計畫 know-how 需要接上儲存來源才能收錄，本版尚未接入。
+          收錄系統本身的設定：部門流程、Agent 職責與邊界、工作流程的關鍵控制條件、
+          業務線與接觸管道，以及政府計畫的資格、金額、經費比例、期限與罰則。
+          外部文件、教材與計畫 know-how 需要接上儲存來源才能收錄，本版尚未接入。
         </p>
+        <p className="dept-step-reason">{programNote}</p>
+        <p className="hub-warning">{mockIsolationNote}</p>
         <div className="field">
           <label className="field-label" htmlFor="kb-search">
             搜尋
@@ -263,11 +573,28 @@ export function KnowledgePage() {
       <section className="card-group">
         <div className="dept-grid">
           {shown.map((entry) => (
-            <article className="card dept-card" key={entry.id}>
+            <article
+              className={entry.demo ? 'card dept-card is-demo' : 'card dept-card'}
+              key={entry.id}
+            >
               <h3 className="dept-name">{entry.title}</h3>
-              <p className="agent-type">{entry.kind}</p>
+              <p className="agent-type">
+                {entry.kind}
+                {entry.demo && <span className="demo-badge">示範資料</span>}
+              </p>
               {entry.body && <p className="dept-duty">{entry.body}</p>}
               {entry.extra && <p className="dept-step-reason">{entry.extra}</p>}
+              {entry.page && (
+                <p className="dept-step-reason">
+                  <button
+                    type="button"
+                    className="jump-link"
+                    onClick={() => onNavigate(entry.page, entry.anchor)}
+                  >
+                    {entry.jump}
+                  </button>
+                </p>
+              )}
             </article>
           ))}
         </div>
@@ -281,12 +608,17 @@ export function KnowledgePage() {
   )
 }
 
-export function PermissionPage() {
+export function PermissionPage({ onNavigate }) {
   const humanGates = []
   workflows.forEach((flow) =>
     flow.exec.forEach((node) => {
       if (node.executor === 'human') {
-        humanGates.push({ flow: flow.name, node: node.name, type: node.gateType })
+        humanGates.push({
+          flowId: flow.id,
+          flow: flow.name,
+          node: node.name,
+          type: node.gateType,
+        })
       }
     })
   )
@@ -355,7 +687,15 @@ export function PermissionPage() {
             {humanGates.map((gate) => (
               <div className="dept-step" key={gate.flow + gate.node}>
                 <p className="dept-step-name">{gate.node}</p>
-                <p className="dept-step-text">{gate.flow}</p>
+                <p className="dept-step-text">
+                  <button
+                    type="button"
+                    className="jump-link"
+                    onClick={() => onNavigate('workflow', 'flow-' + gate.flowId)}
+                  >
+                    {gate.flow}
+                  </button>
+                </p>
                 <p className="dept-step-reason">
                   類型：
                   {gate.type === 'send'
@@ -387,7 +727,7 @@ export function AutomationPage({ onNavigate }) {
   const perFlow = workflows.map((flow) => {
     const agent = flow.exec.filter((n) => n.executor === 'agent').length
     const human = flow.exec.filter((n) => n.executor === 'human').length
-    return { name: flow.name, agent, human, total: flow.exec.length }
+    return { id: flow.id, name: flow.name, agent, human, total: flow.exec.length }
   })
 
   return (
@@ -400,8 +740,16 @@ export function AutomationPage({ onNavigate }) {
         <article className="card dept-card">
           <div className="dept-block">
             {perFlow.map((row) => (
-              <div className="dept-step" key={row.name}>
-                <p className="dept-step-name">{row.name}</p>
+              <div className="dept-step" key={row.id}>
+                <p className="dept-step-name">
+                  <button
+                    type="button"
+                    className="jump-link"
+                    onClick={() => onNavigate('workflow', 'flow-' + row.id)}
+                  >
+                    {row.name}
+                  </button>
+                </p>
                 <p className="dept-step-text">
                   Agent 節點 {row.agent}　人工關卡 {row.human}　共 {row.total} 個節點
                 </p>

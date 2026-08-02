@@ -25,6 +25,7 @@ import {
   rolloutNote,
 } from './agentBlueprint.js'
 import WorkflowDiagram from './WorkflowDiagram.jsx'
+import { findMock, mockNote, mockSourceNote, mockStats } from './mockData.js'
 import { workflows } from './workflows.js'
 import { useEffect, useState } from 'react'
 import {
@@ -64,7 +65,7 @@ export function HomePage({ onNavigate }) {
           </div>
           <div className="info-row">
             <dt>成立年份</dt>
-            <dd>2023 年</dd>
+            <dd>2021 年</dd>
           </div>
           <div className="info-row">
             <dt>規模</dt>
@@ -262,7 +263,36 @@ export function DepartmentsPage() {
   )
 }
 
-function BlueprintSection() {
+function MockCases({ agentId }) {
+  const row = findMock(agentId)
+  if (!row) return null
+  return (
+    <div className="dept-block mock-block">
+      <h4 className="dept-label">
+        示範情境　{row.cases.length} 筆
+        {row.source === 'system' && <span className="mock-flag">系統補寫</span>}
+      </h4>
+      {row.cases.map((item) => (
+        <div className="mock-case" key={item.id}>
+          <p className="mock-case-head">
+            <span className="mock-case-id">{item.id}</span>
+            {item.title}
+          </p>
+          <p className="mock-case-line">
+            <span className="mock-case-label">輸入</span>
+            {item.input}
+          </p>
+          <p className="mock-case-line">
+            <span className="mock-case-label">輸出</span>
+            {item.output}
+          </p>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function BlueprintSection({ onNavigate }) {
   return (
     <>
       <section className="card-group">
@@ -274,20 +304,33 @@ function BlueprintSection() {
           <div className="dept-block">
             {blueprintOverview.map((row) => (
               <div className="dept-step" key={row.dept}>
-                <p className="dept-step-name">
+                <button
+                  type="button"
+                  className="jump-link"
+                  onClick={() => onNavigate('ai-staff', 'dept-' + row.dept)}
+                >
                   {row.dept}　{row.count} 個
-                </p>
+                </button>
                 <p className="dept-step-text">{row.scope}</p>
               </div>
             ))}
             <div className="dept-step">
-              <p className="dept-step-name">合計　19 個 Agent</p>
-              <p className="dept-step-reason">不代表需要 19 個真人</p>
+              <p className="dept-step-name">
+                合計　{blueprint.reduce((total, dept) => total + dept.agents.length, 0)} 個 Agent
+              </p>
+              <p className="dept-step-reason">不代表需要同樣人數的真人</p>
             </div>
           </div>
           <div className="dept-block">
             <h4 className="dept-label">系統設計共通原則</h4>
             <p className="dept-step-text">{blueprintPrinciple}</p>
+          </div>
+          <div className="dept-block">
+            <h4 className="dept-label">
+              示範資料　{mockStats.agents} 位 Agent 共 {mockStats.cases} 筆
+            </h4>
+            <p className="dept-step-text">{mockNote}</p>
+            <p className="dept-step-reason">{mockSourceNote}</p>
           </div>
           <div className="dept-block">
             <p className="dept-step-reason">{rolloutNote}</p>
@@ -314,6 +357,21 @@ function BlueprintSection() {
                 </span>
               ))}
             </p>
+            <div className="dept-block">
+              {workflows
+                .filter((flow) => flow.department === dept.department)
+                .map((flow) => (
+                  <p className="dept-step-reason" key={flow.id}>
+                    <button
+                      type="button"
+                      className="jump-link"
+                      onClick={() => onNavigate('workflow', 'flow-' + flow.id)}
+                    >
+                      前往 {flow.code}　{flow.name}
+                    </button>
+                  </p>
+                ))}
+            </div>
           </article>
 
           <div className="dept-grid agent-grid">
@@ -363,6 +421,8 @@ function BlueprintSection() {
                   <h4 className="dept-label">工作邊界</h4>
                   <p className="dept-step-text">{agent.limit}</p>
                 </div>
+
+                <MockCases agentId={agent.id} />
               </article>
             ))}
 
@@ -593,10 +653,10 @@ function AgentTeamSection({ team }) {
   )
 }
 
-export function AiStaffPage() {
+export function AiStaffPage({ onNavigate }) {
   return (
     <>
-      <BlueprintSection />
+      <BlueprintSection onNavigate={onNavigate} />
       <AgentTeamSection team={trainingTeam} />
       <AgentTeamSection team={governmentTeam} />
       <AgentTeamSection team={agentTeam} />
@@ -606,9 +666,35 @@ export function AiStaffPage() {
   )
 }
 
-export function WorkflowPage() {
+export function WorkflowPage({ onNavigate }) {
   return (
     <>
+      <section className="card">
+        <h2 className="card-title">流程總覽</h2>
+        <p className="group-note">
+          目前共 {workflows.length} 條流程，涵蓋七個部門。點下方任一條，直接跳到該部門的流程欄位。
+        </p>
+        <div className="dept-block">
+          {workflows.map((flow) => (
+            <div className="dept-step" key={flow.id}>
+              <p className="dept-step-name">
+                <button
+                  type="button"
+                  className="jump-link"
+                  onClick={() => onNavigate('workflow', 'flow-' + flow.id)}
+                >
+                  {flow.code}　{flow.name}
+                </button>
+              </p>
+              <p className="dept-step-reason">
+                {flow.department}
+                {flow.focus && `／${flow.focus}`}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {workflows.map((flow) => (
         <section className="card-group" key={flow.id} id={'flow-' + flow.id}>
           <h2 className="group-title">
@@ -616,6 +702,15 @@ export function WorkflowPage() {
             {flow.focus && `／${flow.focus}`}）
           </h2>
           <p className="group-note">{flow.shape}</p>
+          <p className="dept-step-reason">
+            <button
+              type="button"
+              className="jump-link"
+              onClick={() => onNavigate('ai-staff', 'dept-' + flow.department)}
+            >
+              查看 {flow.department} 的 Agent 配置
+            </button>
+          </p>
 
           <article className="card">
             <WorkflowDiagram flow={flow} />
