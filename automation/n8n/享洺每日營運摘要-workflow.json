@@ -1,0 +1,363 @@
+{
+  "name": "享洺每日營運摘要（四 Agent 接力，Level 0 僅內部使用）",
+  "nodes": [
+    {
+      "id": "42f56ffa-22c4-4846-92bc-0233826fc58b",
+      "name": "每日排程觸發",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        80,
+        300
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "30 8 * * *"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "399ad1c2-5810-4ab2-8f01-63140f4bee14",
+      "name": "收集營運資料",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        300,
+        300
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "【請填入：享洺營運資料 API 網址】",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        },
+        "alwaysOutputData": false
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "OPS_API_CRED_ID",
+          "name": "營運資料 API（請替換）"
+        }
+      }
+    },
+    {
+      "id": "c5f6ceeb-e479-43b8-891a-10bc3952dbdf",
+      "name": "S01 經營資料整理員",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        520,
+        300
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'gpt-4o', temperature: 0.2, messages: [ { role: 'system', content: \"你是享洺有限公司的 S01 經營資料整理員。職責：彙整案件、營收、政府計畫與課程資料，形成可供經營判斷的摘要。請依下列主題分類整理：顧問專案、教育訓練、政府計畫、ISO 制度輔導、ESG 碳管理、知識與教材、客戶服務、營運與財務。去除雜訊、保留關鍵數字，以條列方式呈現。工作邊界：只整理資料，不解釋公司應採取何種策略，不評論，不臆測缺漏的數字。原始資料裡沒有的項目一律列在【資料缺口】，不得自行補值。公司資料：享洺有限公司，企業管理顧問，2021 年成立，5 人以下，負責人 SUSU。業務範圍：企業管理顧問、教育訓練、政府計畫輔導、ISO 制度升級與改版輔導、ESG 與碳管理、知識與教材管理、客戶服務、營運與財務管理。治理限制：本產出屬 Level 0 僅內部使用，只給負責人閱讀，不得對外發送。不得產生任何對客戶的承諾、報價、折扣、費用或交期。無法確認的事實一律標示【待確認】，不得編造。資料不足時明確說明資料不足，不得推測補齊。\" }, { role: 'user', content: '以下是今日收集到的原始營運資料：' + JSON.stringify($('收集營運資料').item.json) } ] }) }}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "OPENAI_CRED_ID",
+          "name": "OpenAI（請替換）"
+        }
+      }
+    },
+    {
+      "id": "8b4158fe-1386-4f0b-b84a-45fd69b825e3",
+      "name": "O01 待辦整理員",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        740,
+        300
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'gpt-4o', temperature: 0.2, messages: [ { role: 'system', content: \"你是享洺有限公司的 O01 待辦整理員。職責：把郵件、會議與各案事項整理成責任人、期限與待辦清單。每項標明所屬業務線與建議優先序（高、中、低）。工作邊界：資訊不足以判斷責任人時標記為【待指派】，不得虛構。沒有明確期限者標示【待負責人設定】，不得自行設定期限，也不得寫出任何會被理解為對客戶承諾的日期。公司資料：享洺有限公司，企業管理顧問，2021 年成立，5 人以下，負責人 SUSU。業務範圍：企業管理顧問、教育訓練、政府計畫輔導、ISO 制度升級與改版輔導、ESG 與碳管理、知識與教材管理、客戶服務、營運與財務管理。治理限制：本產出屬 Level 0 僅內部使用，只給負責人閱讀，不得對外發送。不得產生任何對客戶的承諾、報價、折扣、費用或交期。無法確認的事實一律標示【待確認】，不得編造。資料不足時明確說明資料不足，不得推測補齊。\" }, { role: 'user', content: '以下是 S01 彙整的營運資訊：' + $('S01 經營資料整理員').item.json.choices[0].message.content } ] }) }}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "OPENAI_CRED_ID",
+          "name": "OpenAI（請替換）"
+        }
+      }
+    },
+    {
+      "id": "eeeaa1cb-b931-4c9d-bf07-bae97b0e3113",
+      "name": "O03 期限與異常監測員",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        960,
+        300
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'gpt-4o', temperature: 0.2, messages: [ { role: 'system', content: \"你是享洺有限公司的 O03 期限與異常監測員。職責：標示案件逾期、應收逾期、政府計畫查核點與法定申報期限，每項說明異常點與可能影響。工作邊界：沒有明顯異常時明確回覆今日無重大異常，不得為了湊數而編造。不得判定責任歸屬，不得決定處理方式，不得預告主管機關的審查結果。公司資料：享洺有限公司，企業管理顧問，2021 年成立，5 人以下，負責人 SUSU。業務範圍：企業管理顧問、教育訓練、政府計畫輔導、ISO 制度升級與改版輔導、ESG 與碳管理、知識與教材管理、客戶服務、營運與財務管理。治理限制：本產出屬 Level 0 僅內部使用，只給負責人閱讀，不得對外發送。不得產生任何對客戶的承諾、報價、折扣、費用或交期。無法確認的事實一律標示【待確認】，不得編造。資料不足時明確說明資料不足，不得推測補齊。\" }, { role: 'user', content: '以下是 S01 彙整的營運資訊：' + $('S01 經營資料整理員').item.json.choices[0].message.content } ] }) }}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "OPENAI_CRED_ID",
+          "name": "OpenAI（請替換）"
+        }
+      }
+    },
+    {
+      "id": "4f4af97e-a8a7-473a-8b86-df02f60461a3",
+      "name": "S02 方案比較分析員",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        1180,
+        300
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'gpt-4o', temperature: 0.3, messages: [ { role: 'system', content: \"你是享洺有限公司的 S02 方案比較分析員。職責：針對今日需要負責人決定的事項，整理可行選項的成本、效益與風險，供負責人取捨。每一項都要標示【需負責人決定】。工作邊界：只能提出比較，不能替公司決定方向或預算，不得寫出任何要給客戶看的金額、折扣或交期。若今日沒有需要決定的事項，明確回覆今日無待決事項。公司資料：享洺有限公司，企業管理顧問，2021 年成立，5 人以下，負責人 SUSU。業務範圍：企業管理顧問、教育訓練、政府計畫輔導、ISO 制度升級與改版輔導、ESG 與碳管理、知識與教材管理、客戶服務、營運與財務管理。治理限制：本產出屬 Level 0 僅內部使用，只給負責人閱讀，不得對外發送。不得產生任何對客戶的承諾、報價、折扣、費用或交期。無法確認的事實一律標示【待確認】，不得編造。資料不足時明確說明資料不足，不得推測補齊。\" }, { role: 'user', content: '【營運資訊】' + $('S01 經營資料整理員').item.json.choices[0].message.content + '　【待辦事項】' + $('O01 待辦整理員').item.json.choices[0].message.content + '　【期限與異常】' + $('O03 期限與異常監測員').item.json.choices[0].message.content } ] }) }}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "OPENAI_CRED_ID",
+          "name": "OpenAI（請替換）"
+        }
+      }
+    },
+    {
+      "id": "dd267309-d5f4-47eb-816c-1ee447955959",
+      "name": "組裝每日營運摘要",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1400,
+        300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// 組裝每日營運摘要。這一步刻意不呼叫 AI：\n// 四位 Agent 的產出直接原文拼接，避免再經一次改寫而混入沒有依據的內容。\nconst pick = (name) => {\n  try {\n    const payload = $(name).first().json;\n    const text = payload && payload.choices && payload.choices[0]\n      && payload.choices[0].message && payload.choices[0].message.content;\n    return text && String(text).trim() ? String(text).trim() : '【本節點沒有產出，請查看 n8n 執行紀錄】';\n  } catch (err) {\n    return '【本節點沒有產出，請查看 n8n 執行紀錄】';\n  }\n};\n\nconst today = $now.toFormat('yyyy-MM-dd');\n\nconst lines = [\n  '享洺有限公司　每日營運摘要　' + today,\n  '',\n  '【使用限制】',\n  '本摘要屬 Level 0 僅內部使用，只給負責人閱讀。',\n  '不得轉寄客戶，不得作為對外回覆的依據。',\n  '內容由 AI 整理，未經人工核准前不得引用為正式結論。',\n  '標示【待確認】【待指派】【待負責人設定】【資料缺口】的項目，一律需要人補齊。',\n  '',\n  '一、營運資訊（S01 經營資料整理員）',\n  pick('S01 經營資料整理員'),\n  '',\n  '二、待辦與優先序（O01 待辦整理員）',\n  pick('O01 待辦整理員'),\n  '',\n  '三、期限與異常（O03 期限與異常監測員）',\n  pick('O03 期限與異常監測員'),\n  '',\n  '四、需負責人決定（S02 方案比較分析員）',\n  pick('S02 方案比較分析員'),\n  '',\n  '本摘要到此為止。任何對外回覆、報價、承諾與申報，仍須由負責人另行決定並由人送出。',\n];\n\nreturn [{ json: { subject: '享洺每日營運摘要　' + today, body: lines.join('\\n'), date: today }, pairedItem: 0 }];"
+      }
+    },
+    {
+      "id": "57e0d30b-1b29-463a-853e-6847fe3459fe",
+      "name": "寄送給負責人",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        1620,
+        300
+      ],
+      "parameters": {
+        "fromEmail": "【請填入：寄件者信箱】",
+        "toEmail": "【請填入：負責人收件信箱】",
+        "subject": "={{ $json.subject }}",
+        "emailFormat": "text",
+        "text": "={{ $json.body }}",
+        "options": {}
+      },
+      "credentials": {
+        "smtp": {
+          "id": "SMTP_CRED_ID",
+          "name": "寄信 SMTP（請替換）"
+        }
+      }
+    },
+    {
+      "id": "5c5720d9-10c6-4eb0-b8be-1dd15b0fd597",
+      "name": "錯誤觸發器",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        80,
+        580
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "c93700a6-534a-46c4-9f7f-43f710a9ecff",
+      "name": "錯誤通知",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        300,
+        580
+      ],
+      "parameters": {
+        "fromEmail": "【請填入：寄件者信箱】",
+        "toEmail": "【請填入：負責人收件信箱】",
+        "subject": "【警告】享洺每日營運摘要工作流執行失敗",
+        "emailFormat": "text",
+        "text": "={{ '享洺每日營運摘要工作流執行失敗。　失敗節點：' + ($json.execution && $json.execution.lastNodeExecuted ? $json.execution.lastNodeExecuted : '未知') + '　今日沒有產生摘要，請至 n8n 執行紀錄查看詳情。不要把這封信當成今日無異常。' }}",
+        "options": {}
+      },
+      "credentials": {
+        "smtp": {
+          "id": "SMTP_CRED_ID",
+          "name": "寄信 SMTP（請替換）"
+        }
+      }
+    },
+    {
+      "id": "d6213f49-d33e-4fba-adf3-010c3acbbb6d",
+      "name": "治理註記",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        80,
+        40
+      ],
+      "parameters": {
+        "width": 720,
+        "height": 200,
+        "content": "## 享洺治理規則（Level 0 僅內部使用）\n\n收件人只能是負責人。這條流程不得新增任何對外發送節點。\n四位 Agent 只做整理、彙整與比較，不得產生對客承諾、報價、折扣或交期。\n組裝節點刻意不呼叫 AI，四段產出原文拼接，避免再改寫時混入沒有依據的內容。\n要改成對客戶發送，必須先加人工核准節點，並依審核規則判定 Level。"
+      }
+    }
+  ],
+  "connections": {
+    "每日排程觸發": {
+      "main": [
+        [
+          {
+            "node": "收集營運資料",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "收集營運資料": {
+      "main": [
+        [
+          {
+            "node": "S01 經營資料整理員",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S01 經營資料整理員": {
+      "main": [
+        [
+          {
+            "node": "O01 待辦整理員",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "O01 待辦整理員": {
+      "main": [
+        [
+          {
+            "node": "O03 期限與異常監測員",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "O03 期限與異常監測員": {
+      "main": [
+        [
+          {
+            "node": "S02 方案比較分析員",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S02 方案比較分析員": {
+      "main": [
+        [
+          {
+            "node": "組裝每日營運摘要",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "組裝每日營運摘要": {
+      "main": [
+        [
+          {
+            "node": "寄送給負責人",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "錯誤觸發器": {
+      "main": [
+        [
+          {
+            "node": "錯誤通知",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "meta": {
+    "generatedBy": "n8n-workflow-generator skill v1.0.0",
+    "generatedAt": "2026-08-02T06:35:19.028596",
+    "n8nVersion": "1.x-stable",
+    "industryProfile": "general"
+  }
+}
