@@ -7,6 +7,16 @@ import {
 } from './agentBlueprint.js'
 import { authority, authorityNote } from './authority.js'
 import { businessLines, caseLifecycle, channels } from './businessLines.js'
+import {
+  hubFaq,
+  hubNote,
+  hubPolicies,
+  hubRules,
+  hubStats,
+  riskLabel,
+  statusLabel,
+  summaryOf,
+} from './knowledgeHub.js'
 import { mockData, mockStats } from './mockData.js'
 import { programNote, programs } from './programs.js'
 import { workflows } from './workflows.js'
@@ -305,6 +315,90 @@ function buildEntries() {
   return entries
 }
 
+function HubCard({ entry }) {
+  return (
+    <article
+      className={entry.agentUsable ? 'card hub-card' : 'card hub-card is-unapproved'}
+      id={'hub-' + entry.id}
+    >
+      <p className="hub-id">{entry.id}</p>
+      <h3 className="dept-name">{entry.title}</h3>
+
+      <p className="hub-badges">
+        <span className={'hub-status hub-status-' + entry.status}>
+          {statusLabel(entry.status)}
+        </span>
+        <span className={'hub-risk hub-risk-' + entry.riskLevel}>
+          {riskLabel(entry.riskLevel)}
+        </span>
+        <span className={entry.canQuoteExternally ? 'hub-flag is-yes' : 'hub-flag is-no'}>
+          {entry.canQuoteExternally ? '可對外引用' : '不可對外引用'}
+        </span>
+        <span className={entry.requiresHumanReview ? 'hub-flag is-no' : 'hub-flag is-yes'}>
+          {entry.requiresHumanReview ? '需人工審核' : '免人工審核'}
+        </span>
+      </p>
+
+      {entry.type === 'faq' && <p className="hub-question">Q：{entry.question}</p>}
+      <p className="dept-duty">{summaryOf(entry)}</p>
+
+      {entry.hasPlaceholder && (
+        <p className="hub-warning">資料尚未完成，不可對外引用</p>
+      )}
+      {!entry.agentUsable && (
+        <p className="hub-note">尚未核准，Agent 不得當成正式答案使用</p>
+      )}
+    </article>
+  )
+}
+
+function KnowledgeHubSection() {
+  return (
+    <>
+      <section className="card">
+        <h2 className="card-title">Knowledge Hub</h2>
+        <p className="group-note">{hubNote}</p>
+        <div className="dept-block">
+          <h4 className="dept-label">系統控制規則</h4>
+          <ul className="dept-list">
+            {hubRules.map((rule) => (
+              <li key={rule}>{rule}</li>
+            ))}
+          </ul>
+        </div>
+        <p className="dept-step-reason">
+          共 {hubStats.total} 條（FAQ {hubStats.faq}、Policy {hubStats.policy}）。
+          已核准 {hubStats.approved}、待審核 {hubStats.pending}、草稿 {hubStats.draft}。
+          可對外引用 {hubStats.quotable}、需人工審核 {hubStats.needsReview}、
+          內容含待填 {hubStats.withPlaceholder}。
+        </p>
+      </section>
+
+      <section className="card-group">
+        <h2 className="group-title">FAQ　常見問題與標準答案</h2>
+        <p className="group-note">
+          標準答案只供 Agent 草擬回覆，不代表 Agent 可以自動送出。
+        </p>
+        <div className="dept-grid">
+          {hubFaq.map((entry) => (
+            <HubCard entry={entry} key={entry.id} />
+          ))}
+        </div>
+      </section>
+
+      <section className="card-group">
+        <h2 className="group-title">SOP／Policies　政策與原則</h2>
+        <p className="group-note">政策為內部規範，核准前不得作為對外說法。</p>
+        <div className="dept-grid">
+          {hubPolicies.map((entry) => (
+            <HubCard entry={entry} key={entry.id} />
+          ))}
+        </div>
+      </section>
+    </>
+  )
+}
+
 export function KnowledgePage({ onNavigate }) {
   const [query, setQuery] = useState('')
   const entries = useMemo(buildEntries, [])
@@ -317,8 +411,10 @@ export function KnowledgePage({ onNavigate }) {
 
   return (
     <>
+      <KnowledgeHubSection />
+
       <section className="card">
-        <h2 className="card-title">知識庫</h2>
+        <h2 className="card-title">系統設定條目</h2>
         <p className="group-note">
           收錄系統本身的設定：部門流程、Agent 職責與邊界、工作流程的關鍵控制條件、
           業務線與接觸管道，以及政府計畫的資格、金額、經費比例、期限與罰則。

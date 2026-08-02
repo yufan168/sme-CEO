@@ -1021,3 +1021,107 @@ body {
   margin-right: 6px;
   color: var(--text-muted);
 }
+
+/* Knowledge Hub */
+.hub-card {
+  border-left: 4px solid var(--brand-gold);
+}
+
+.hub-card.is-unapproved {
+  border-left-color: var(--line);
+  background: var(--warm-white);
+}
+
+.hub-id {
+  margin: 0 0 2px;
+  font-size: 13px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+.hub-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 0;
+}
+
+.hub-status,
+.hub-risk,
+.hub-flag {
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.hub-status-approved {
+  background: #e6f3ea;
+  color: #1f6b3a;
+}
+
+.hub-status-pending {
+  background: var(--brand-gold-soft);
+  color: #5c4219;
+}
+
+.hub-status-draft {
+  background: var(--cream);
+  color: var(--brand-brown-mid);
+}
+
+.hub-status-disabled {
+  background: #f0eeec;
+  color: #9c9490;
+}
+
+.hub-risk-low {
+  border: 1px solid #9ccdaa;
+  color: #1f6b3a;
+}
+
+.hub-risk-medium {
+  border: 1px solid #e8b071;
+  color: #9a5c14;
+}
+
+.hub-risk-high {
+  border: 1px solid #b4665a;
+  color: #8c3a2b;
+}
+
+.hub-flag {
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.hub-flag.is-no {
+  border-color: #d8b6ae;
+  color: #8c3a2b;
+}
+
+.hub-flag.is-yes {
+  border-color: #9ccdaa;
+  color: #1f6b3a;
+}
+
+.hub-question {
+  margin: 10px 0 0;
+  font-weight: 600;
+}
+
+.hub-warning {
+  margin: 10px 0 0;
+  padding: 6px 10px;
+  border-left: 3px solid #b4665a;
+  background: #faf1ef;
+  color: #8c3a2b;
+  font-size: 14px;
+}
+
+.hub-note {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
