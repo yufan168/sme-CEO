@@ -7,6 +7,7 @@ import {
 } from './agentBlueprint.js'
 import { authority, authorityNote } from './authority.js'
 import { GovernanceRolesSection } from './governanceSections.jsx'
+import { InquiryAutomationSection } from './inquirySection.jsx'
 import { businessLines, caseLifecycle, channels } from './businessLines.js'
 import {
   categories,
@@ -739,6 +740,8 @@ export function AutomationPage({ onNavigate }) {
 
   return (
     <>
+      <InquiryAutomationSection onNavigate={onNavigate} />
+
       <section className="card-group">
         <h2 className="group-title">目前的自動化程度</h2>
         <p className="group-note">
