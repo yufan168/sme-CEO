@@ -1,24 +1,32 @@
 {
-  "name": "sme-ceo",
+  "name": "aios-cloud",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "version": "8.1",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "oxlint",
-    "preview": "vite preview"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "validate": "node scripts/validate.mjs",
+    "smoke": "node scripts/smoke.mjs",
+    "redteam": "node scripts/redteam.mjs",
+    "selftest": "node scripts/selftest.mjs",
+    "skills:import": "node scripts/import-skills.mjs",
+    "skills:parity": "node scripts/skill-parity.mjs",
+    "package": "node scripts/package.mjs"
   },
   "dependencies": {
-    "mermaid": "^11.16.0",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "@electric-sql/pglite": "^0.5.4",
+    "@neondatabase/serverless": "^0.10.0",
+    "esbuild": "^0.28.1",
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@types/node": "^22.20.1",
     "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.4",
-    "oxlint": "^1.75.0",
-    "vite": "^8.2.0"
-  }
+    "typescript": "^5.9.3"
+  },
+  "author": "酒Ann",
+  "license": "SEE LICENSE IN LICENSE.md"
 }
