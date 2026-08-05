@@ -1,12 +1,14 @@
 import { useMemo, useState } from 'react'
 import {
   EXPORT_VERSION,
+  buildAgentImportExport,
   buildBrandExport,
   buildPublicExport,
   designTokenGroups,
   downloadJson,
   exportFilename,
   exportNotice,
+  mockReferenceIssues,
   readDesignTokens,
 } from './brandExport.js'
 
@@ -14,8 +16,14 @@ const KINDS = [
   {
     id: 'full',
     label: '完整版',
-    note: '公司資料、定位、設計代幣、業務線、9 部門 35 位 Agent、11 條流程、治理規則、36 張知識卡片全文。',
+    note: '公司資料、定位、設計代幣、業務線、9 部門 35 位 Agent、11 條流程、治理規則、36 張知識卡片全文，以及全部示範資料。',
     build: buildBrandExport,
+  },
+  {
+    id: 'agent',
+    label: 'Agent 管理系統匯入版',
+    note: '攤平成部門 → Agent → 示範情境三層。每位 Agent 直接帶自己的示範情境，匯入端不必再對照。',
+    build: buildAgentImportExport,
   },
   {
     id: 'public',
@@ -33,6 +41,16 @@ export function BrandExportPanel() {
   const current = KINDS.find((item) => item.id === kind) ?? KINDS[0]
   const data = useMemo(() => current.build(), [current])
   const size = useMemo(() => JSON.stringify(data).length, [data])
+  const issues = useMemo(() => mockReferenceIssues(), [])
+
+  // knowledge 在完整版是物件、在匯入版是陣列，兩種都要數得出來。
+  const cardCount = Array.isArray(data.knowledge)
+    ? data.knowledge.length
+    : (data.knowledge?.cards?.length ?? 0)
+  const demoCases =
+    kind === 'agent'
+      ? data.agents.reduce((total, agent) => total + agent.demoCases.length, 0)
+      : (data.mockData?.cases ?? 0)
 
   const onDownload = () => setResult(downloadJson(exportFilename(kind), data))
 
@@ -84,19 +102,41 @@ export function BrandExportPanel() {
         <p className="dept-role">
           <span className="dept-role-name">知識卡片</span>
           <span>
-            {kind === 'full'
-              ? `${data.knowledge.cards.length} 張（含 Internal）`
-              : `${data.knowledge.cards.length} 張（僅可原文對外）`}
+            {kind === 'public' ? `${cardCount} 張（僅可原文對外）` : `${cardCount} 張（含 Internal）`}
           </span>
         </p>
+        {kind !== 'public' && (
+          <p className="dept-role">
+            <span className="dept-role-name">示範情境</span>
+            <span>{demoCases} 筆（虛構，逐句標示）</span>
+          </p>
+        )}
+        {kind === 'agent' && (
+          <p className="dept-role">
+            <span className="dept-role-name">Agent</span>
+            <span>
+              {data.agents.length} 位／{data.departments.length} 個部門
+            </span>
+          </p>
+        )}
         <p className="dept-role">
           <span className="dept-role-name">是否含 API 金鑰</span>
           <span className="gov-yes">否</span>
         </p>
       </div>
 
-      <p className={kind === 'full' ? 'run-error' : 'gov-allow'}>
-        {kind === 'full' ? exportNotice : '本檔已移除 Internal 知識與治理細節，可提供給外部工具。'}
+      {kind === 'agent' && (
+        <p className={issues.length === 0 ? 'gov-allow' : 'run-error'}>
+          {issues.length === 0
+            ? '示範資料與編制逐一對得上，沒有指向不存在的 Agent，也沒有人漏掉示範情境。'
+            : `對照有 ${issues.length} 個問題：${issues.join('；')}`}
+        </p>
+      )}
+
+      <p className={kind === 'public' ? 'gov-allow' : 'run-error'}>
+        {kind === 'public'
+          ? '本檔已移除 Internal 知識與治理細節，可提供給外部工具。'
+          : exportNotice}
       </p>
 
       <div className="field-actions">

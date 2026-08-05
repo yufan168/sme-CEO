@@ -12,6 +12,7 @@ import { workflows } from './workflows.js'
 import { approvalLevels, riskKeywordGroups } from './govApproval.js'
 import { systemRoles } from './govRoles.js'
 import { aiPolicies } from './govSystem.js'
+import { MOCK_LABEL, mockData, mockIsolationNote, mockStats } from './mockData.js'
 
 export const EXPORT_VERSION = '1.0'
 
@@ -202,6 +203,162 @@ export function buildBrandExport() {
         tags: card.tags,
       })),
     },
+
+    mockData: buildMockSection(),
+  }
+}
+
+// 示範資料。五個隔離旗標與每一句的示範標記都原樣帶出去，
+// 匯進別的系統後仍然看得出來這不是享洺的真實數據。
+function buildMockSection() {
+  return {
+    label: MOCK_LABEL,
+    isolation: mockIsolationNote,
+    agents: mockStats.agents,
+    cases: mockStats.cases,
+    rows: mockData.map((row) => ({
+      agentId: row.agentId,
+      agentName: row.agentName,
+      department: row.dept,
+      source: row.source,
+      mode: row.mode,
+      isFictional: row.isFictional,
+      companyData: row.companyData,
+      canSendExternally: row.canSendExternally,
+      allowKnowledgeRetrieval: row.allowKnowledgeRetrieval,
+      cases: row.cases.map((item) => ({
+        id: item.id,
+        title: item.title,
+        input: item.input,
+        output: item.output,
+      })),
+    })),
+  }
+}
+
+// 示範資料指到的 Agent 必須真的存在，反過來也要每位都有示範資料。
+// 匯進外部系統前先擋掉對不上的情況，不要等匯完才發現少人。
+export function mockReferenceIssues() {
+  const blueprintIds = new Set(blueprint.flatMap((dept) => dept.agents.map((agent) => agent.id)))
+  const mockIds = new Set(mockData.map((row) => row.agentId))
+  const issues = []
+  mockData.forEach((row) => {
+    if (!blueprintIds.has(row.agentId)) {
+      issues.push(`示範資料 ${row.agentId} 找不到對應的 Agent。`)
+    }
+  })
+  blueprint.forEach((dept) => {
+    dept.agents.forEach((agent) => {
+      if (!mockIds.has(agent.id)) {
+        issues.push(`${agent.id}（${agent.name}）沒有示範資料。`)
+      }
+    })
+  })
+  return issues
+}
+
+// 給外部 Agent 管理系統匯入用。攤平成「部門 → Agent → 示範情境」三層，
+// 不用巢狀的品牌結構，因為多數管理工具只吃得下一份扁平的 agent 清單。
+export function buildAgentImportExport() {
+  const mockByAgent = new Map(mockData.map((row) => [row.agentId, row]))
+
+  return {
+    _meta: {
+      schema: 'xiangming-agent-import',
+      version: EXPORT_VERSION,
+      exportedAt: new Date().toISOString(),
+      source: '享洺 AI 公司管理系統',
+      scope: 'agent-manager-import',
+      notice:
+        '含享洺內部編制與治理規則，僅供內部管理系統使用。示範情境為虛構資料，已逐句標記。檔案不含 API 金鑰。',
+      containsApiKey: false,
+      referenceIssues: mockReferenceIssues(),
+    },
+
+    company: companyProfile,
+
+    principle: blueprintPrinciple,
+    governanceChain,
+
+    design: {
+      colors: readDesignTokens(),
+      typography: readTypography(),
+    },
+
+    departments: blueprint.map((dept) => ({
+      name: dept.department,
+      agentCount: dept.agents.length,
+      gateChain: dept.gateChain,
+      flow: dept.flow,
+    })),
+
+    agents: blueprint.flatMap((dept) =>
+      dept.agents.map((agent) => {
+        const mock = mockByAgent.get(agent.id)
+        return {
+          id: agent.id,
+          name: agent.name,
+          department: dept.department,
+          type: agent.type,
+          duty: agent.duty,
+          limit: agent.limit,
+          outputContract: agent.output ?? [],
+          // 每位 Agent 帶自己的示範情境，匯入端不必再做一次 join。
+          demoCases: mock
+            ? mock.cases.map((item) => ({
+                id: item.id,
+                title: item.title,
+                input: item.input,
+                output: item.output,
+                isFictional: true,
+                canSendExternally: false,
+              }))
+            : [],
+          demoSource: mock?.source ?? '',
+        }
+      })
+    ),
+
+    workflows: workflows.map((flow) => ({
+      code: flow.code,
+      name: flow.name,
+      department: flow.department,
+      goal: flow.goal,
+      steps: flow.exec.map((node, index) => ({
+        order: index + 1,
+        name: node.name,
+        executor: node.executor,
+        agentId: node.agentId ?? '',
+        agentName: node.agentName ?? '',
+      })),
+    })),
+
+    governance: {
+      roles: systemRoles.map((role) => ({ name: role.name, who: role.who, note: role.note })),
+      approvalLevels: approvalLevels.map((level) => ({
+        level: level.id,
+        name: level.name,
+        approverRole: level.approverRole,
+        humanSendRequired: level.humanSendRequired,
+      })),
+      aiPolicies: aiPolicies.map((policy) => ({ id: policy.id, name: policy.name, text: policy.text })),
+    },
+
+    knowledge: knowledgeCards.map((card) => ({
+      id: card.id,
+      title: card.title,
+      category: card.category,
+      summary: card.summary,
+      content: card.content,
+      owner: card.owner,
+      status: card.status,
+      visibility: card.visibility,
+      allowAIUse: card.allowAIUse,
+      canQuoteExternally: card.canQuoteExternally,
+      tags: card.tags,
+    })),
+
+    demoDataNote: mockIsolationNote,
   }
 }
 
