@@ -2,6 +2,8 @@ import { hasApiKey } from './aiSettings.js'
 import { callAI } from './callAI.js'
 import { MOCK_LABEL, findMock } from './mockData.js'
 import { buildProgramBrief } from './programs.js'
+import { classifyRisk, outputContractGaps } from './governance.js'
+import { isNodeEnabled } from './agentBinding.js'
 
 // 通用執行器：只讀 Workflow 定義，不寫死任何流程順序。
 // 換一份定義就能執行另一條流程，不需要修改這個檔案。
@@ -95,20 +97,23 @@ async function executeAgentNode(workflow, run, node) {
         summary: node.demoOutput.summary,
         basis: node.demoOutput.basis,
         output: node.demoOutput.result,
+        risk: classifyRisk(node.demoOutput.result),
       }
     }
     // 節點未附示範產出時，退回使用該 Agent 的示範資料，流程不中斷。
     // 示範資料一律標明來源，不得看起來像真實營運數字。
     const mock = findMock(node.agentId)
     if (mock) {
+      const mockText = mock.cases
+        .map((item) => `【${item.id}　${item.title}】\n輸入：${item.input}\n輸出：${item.output}`)
+        .join('\n\n')
       return {
         status: 'completed',
         mode: 'demo',
         summary: mock.cases[0].title,
         basis: [MOCK_LABEL + 'Agent 示範資料 ' + mock.cases[0].id],
-        output: mock.cases
-          .map((item) => `【${item.id}　${item.title}】\n輸入：${item.input}\n輸出：${item.output}`)
-          .join('\n\n'),
+        output: mockText,
+        risk: classifyRisk(mockText),
       }
     }
     return {
@@ -121,8 +126,20 @@ async function executeAgentNode(workflow, run, node) {
   const { systemPrompt, userPrompt } = buildPrompt(workflow, node, previous)
   const result = await callAI({ systemPrompt, userPrompt })
 
+  // 停止條件一：模型呼叫失敗。不改用示範內容頂替。
   if (!result.ok) {
     return { status: 'failed', mode: 'real-ai', error: result.error }
+  }
+
+  // 停止條件二：output contract 缺段。不接受看起來合理但少了段落的產出。
+  const gaps = outputContractGaps(result.text, node.outputContract)
+  if (gaps.length) {
+    return {
+      status: 'failed',
+      mode: 'real-ai',
+      error: `產出缺少必要段落：${gaps.map((item) => `【${item}】`).join('')}。依停止條件不自動補齊，請人工處理。`,
+      output: result.text,
+    }
   }
 
   return {
@@ -131,6 +148,8 @@ async function executeAgentNode(workflow, run, node) {
     summary: node.instruction,
     basis: [...basis, '公司基本資料'],
     output: result.text,
+    // 風險分級在產出當下就算好，不等到要送出才判斷。
+    risk: classifyRisk(result.text),
   }
 }
 
@@ -154,6 +173,18 @@ export async function runWorkflow(workflow, run, onUpdate, startId) {
     }
 
     if (current.executor === 'agent') {
+      // 被取消勾選的 Agent 節點不執行，但要明白標示，不能靜默消失。
+      if (!isNodeEnabled(workflow.id, current.id)) {
+        run.nodes[current.id] = {
+          status: 'skipped',
+          summary: '已停用，本次不執行',
+          skippedReason: `「${current.name}」已於綁定 AI 員工中取消勾選。`,
+        }
+        onUpdate({ ...run })
+        current = current.next ? findNode(workflow, current.next) : null
+        continue
+      }
+
       run.nodes[current.id] = { status: 'running' }
       run.currentNodeId = current.id
       onUpdate({ ...run })

@@ -1452,6 +1452,250 @@ export const workflows = [
     ]
   },
   {
+    "id": "wf-q01",
+    "code": "WF-Q01",
+    "name": "詢價與一般訊息處理流程",
+    "department": "客戶服務部",
+    "focus": "詢價與一般訊息",
+    "shape": "Chain 加兩個人工決策點。負責人審核可退回重寫；結案確認未通過則回到追蹤。前段五步由機器完成，送出與結案一律由人決定。",
+    "goal": "把詢價與一般訊息自動建案、摘要、分類、查資料並草擬回覆，停在人工閘門；人送出後再由機器建立追蹤與結案摘要。金額、時程、承諾與是否承接全部保留給人。",
+    "definition": "flowchart LR\n  start([\"收到詢價或訊息\"])\n  intake[\"建案並保存原文\"]\n  tidy[\"整理需求摘要\"]\n  route[\"分類與風險標記\"]\n  lookup[\"查詢已核准資料\"]\n  draft[\"草擬回覆\"]\n  approve{\"負責人審核\"}\n  send[\"由人正式送出\"]\n  track[\"建立追蹤事項\"]\n  close{\"負責人確認結案\"}\n  wrap[\"整理結案摘要\"]\n  finish([\"流程完成\"])\n  start --> intake\n  intake --> tidy\n  tidy --> route\n  route --> lookup\n  lookup --> draft\n  draft --> approve\n  approve -->|核准| send\n  approve -->|退回重寫| draft\n  send --> track\n  track --> close\n  close -->|結案| wrap\n  close -->|尚未結案| track\n  wrap --> finish\n  classDef systemNode fill:#F2EEEA,stroke:#A99B92,color:#5A4940;\n  classDef agentNode fill:#FFF4C2,stroke:#F7B729,color:#5C4219;\n  classDef humanNode fill:#372C27,stroke:#372C27,color:#FFFFFF;\n  classDef decisionNode fill:#372C27,stroke:#F7B729,color:#FFFFFF,stroke-width:3px;\n  class start,intake,track,wrap,finish systemNode;\n  class tidy,route,lookup,draft agentNode;\n  class send humanNode;\n  class approve,close decisionNode;",
+    "nodes": [
+      {
+        "id": "－",
+        "work": "收到詢價或訊息",
+        "owner": "系統起點",
+        "kind": "system"
+      },
+      {
+        "id": "A",
+        "work": "建案並保存原文",
+        "owner": "系統",
+        "kind": "system"
+      },
+      {
+        "id": "B",
+        "work": "整理需求摘要",
+        "owner": "Agent：來訊整理員（X01）",
+        "kind": "agent"
+      },
+      {
+        "id": "C",
+        "work": "分類與風險標記",
+        "owner": "Agent：問題分派員（X02）",
+        "kind": "agent"
+      },
+      {
+        "id": "D",
+        "work": "查詢已核准資料",
+        "owner": "Agent：客服資料查詢員（X03）",
+        "kind": "agent"
+      },
+      {
+        "id": "E",
+        "work": "草擬回覆",
+        "owner": "Agent：提案與報價草擬員（C03）",
+        "kind": "agent"
+      },
+      {
+        "id": "F",
+        "work": "負責人審核",
+        "owner": "人（可退回重寫）",
+        "kind": "decision"
+      },
+      {
+        "id": "G",
+        "work": "由人正式送出",
+        "owner": "人",
+        "kind": "human"
+      },
+      {
+        "id": "H",
+        "work": "建立追蹤事項",
+        "owner": "系統",
+        "kind": "system"
+      },
+      {
+        "id": "I",
+        "work": "負責人確認結案",
+        "owner": "人（未結案則回到追蹤）",
+        "kind": "decision"
+      },
+      {
+        "id": "J",
+        "work": "整理結案摘要",
+        "owner": "系統",
+        "kind": "system"
+      },
+      {
+        "id": "－",
+        "work": "流程完成",
+        "owner": "系統終點",
+        "kind": "system"
+      }
+    ],
+    "exec": [
+      {
+        "id": "intake",
+        "name": "建案並保存原文",
+        "executor": "system",
+        "systemType": "start",
+        "next": "tidy"
+      },
+      {
+        "id": "tidy",
+        "name": "整理需求摘要",
+        "executor": "agent",
+        "agentId": "X01",
+        "agentName": "來訊整理員",
+        "instruction": "把原始訊息整理成需求摘要、客戶訴求、已知資料與缺少資料，不得補寫客戶未提供的資訊，不得改變原意。",
+        "readsFrom": [],
+        "outputContract": [
+          "問題摘要",
+          "客戶訴求",
+          "已知資料",
+          "缺少資料",
+          "緊急程度"
+        ],
+        "demoOutput": {
+          "summary": "整理示範詢價訊息。",
+          "basis": [
+            "原始訊息"
+          ],
+          "result": "【問題摘要】\\n客戶詢問三十人規模的 ISO 9001 改版內訓，想了解課程安排與費用。\\n\\n【客戶訴求】\\n希望取得課程規劃與報價。\\n\\n【已知資料】\\n人數約三十人；產業為金屬加工；希望於下季進行。\\n\\n【缺少資料】\\n上課地點、實際日期、是否需要輔導文件、預算範圍。\\n\\n【緊急程度】\\n一般，客戶未表示急迫。"
+        },
+        "next": "route"
+      },
+      {
+        "id": "route",
+        "name": "分類與風險標記",
+        "executor": "agent",
+        "agentId": "X02",
+        "agentName": "問題分派員",
+        "instruction": "判斷案件類型與風險等級，建議承辦部門。不得判斷客戶是否值得承接，也不得預估成交機率。",
+        "readsFrom": [
+          "tidy"
+        ],
+        "outputContract": [
+          "問題類型",
+          "風險等級",
+          "建議承辦部門",
+          "是否立即通知負責人"
+        ],
+        "demoOutput": {
+          "summary": "對示範詢價分類並標記風險。",
+          "basis": [
+            "需求摘要"
+          ],
+          "result": "【問題類型】\\n課程與內訓諮詢，同時含詢價需求。\\n\\n【風險等級】\\nHigh。訊息中出現「費用」，屬 Level 4，金額只有負責人能決定。\\n\\n【建議承辦部門】\\n教育訓練交付部，報價由客戶開發與行銷部協同。\\n\\n【是否立即通知負責人】\\n是，因涉及報價。"
+        },
+        "next": "lookup"
+      },
+      {
+        "id": "lookup",
+        "name": "查詢已核准資料",
+        "executor": "agent",
+        "agentId": "X03",
+        "agentName": "客服資料查詢員",
+        "instruction": "查詢已核准且未過期的服務說明、過往合作與報價政策。只能引用通過知識治理檢查的內容，找不到可靠資料時標示資料不足，不得猜測。",
+        "readsFrom": [
+          "tidy",
+          "route"
+        ],
+        "outputContract": [
+          "已確認事實",
+          "引用知識與版本",
+          "資料矛盾",
+          "缺少資料",
+          "需人工確認事項"
+        ],
+        "demoOutput": {
+          "summary": "查詢示範詢價可引用的已核准資料。",
+          "basis": [
+            "需求摘要",
+            "分類結果"
+          ],
+          "result": "【已確認事實】\\n教育訓練可依學習對象、產業情境、課程目標與時數規劃；正式課綱、交付內容、費用與時程須經需求確認後另行提供。\\n\\n【引用知識與版本】\\nSERVICE-002 v1.0、POLICY-003 v1.0。\\n\\n【資料矛盾】\\n無。\\n\\n【缺少資料】\\n知識庫沒有任何課程價目，POLICY-003 明定報價須個案確認。\\n\\n【需人工確認事項】\\n本案報價區間、是否含教材與輔導文件、講師安排。"
+        },
+        "next": "draft"
+      },
+      {
+        "id": "draft",
+        "name": "草擬回覆",
+        "executor": "agent",
+        "agentId": "C03",
+        "agentName": "提案與報價草擬員",
+        "instruction": "依需求與已確認事實草擬回覆，列出需負責人決定的項目。不得寫入任何金額、單價、折扣、完成日期，也不得承諾一定承接或一定達成。",
+        "readsFrom": [
+          "tidy",
+          "lookup"
+        ],
+        "outputContract": [
+          "詢問摘要",
+          "已確認事實",
+          "回覆草稿",
+          "建議處理方向",
+          "需負責人決定",
+          "引用知識與版本",
+          "風險等級"
+        ],
+        "demoOutput": {
+          "summary": "依示範資料草擬回覆，金額留空給負責人。",
+          "basis": [
+            "需求摘要",
+            "查詢結果"
+          ],
+          "result": "【詢問摘要】\\n三十人規模的 ISO 9001 改版內訓，欲了解課程安排與費用。\\n\\n【已確認事實】\\n課程可依產業情境與時數規劃；費用須經需求確認後另行提供。\\n\\n【回覆草稿】\\n您好，感謝來訊。三十人規模的 ISO 9001 改版內訓我們可以規劃，課程內容會依貴公司現行文件狀況與改版重點調整。為了提供合適的規劃與報價，想先確認幾件事：預計上課日期與地點、是否需要一併協助文件改版、以及希望的總時數。收到後我們會盡快提供正式規劃給您。\\n\\n【建議處理方向】\\n先取得四項缺少資料再出正式提案，避免在資訊不足下報價。\\n\\n【需負責人決定】\\n報價金額：待負責人決定\\n是否含教材與文件輔導：待負責人決定\\n可承諾的時程：待負責人決定\\n是否承接本案：待負責人決定\\n\\n【引用知識與版本】\\nSERVICE-002 v1.0、POLICY-003 v1.0。\\n\\n【風險等級】\\nHigh，涉及報價，須負責人核准後由人送出。"
+        },
+        "next": "approve"
+      },
+      {
+        "id": "approve",
+        "name": "負責人審核",
+        "executor": "human",
+        "gateType": "review",
+        "waitingMessage": "等待負責人審核，需決定服務範圍、金額、時程與是否承接",
+        "rejectTo": "draft",
+        "next": "send"
+      },
+      {
+        "id": "send",
+        "name": "由人正式送出",
+        "executor": "human",
+        "gateType": "send",
+        "waitingMessage": "等你決定送出，送出後才會建立追蹤",
+        "next": "track"
+      },
+      {
+        "id": "track",
+        "name": "建立追蹤事項",
+        "executor": "system",
+        "next": "close"
+      },
+      {
+        "id": "close",
+        "name": "負責人確認結案",
+        "executor": "human",
+        "gateType": "review",
+        "waitingMessage": "等待負責人確認是否結案",
+        "rejectTo": "track",
+        "next": "wrap"
+      },
+      {
+        "id": "wrap",
+        "name": "整理結案摘要",
+        "executor": "system",
+        "next": "finish"
+      },
+      {
+        "id": "finish",
+        "name": "流程完成",
+        "executor": "system",
+        "systemType": "end"
+      }
+    ]
+  },
+  {
     id: "wf-o01",
     code: "WF-O01",
     name: "營運與財務檢視流程",

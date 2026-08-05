@@ -10,6 +10,7 @@ mermaid.initialize({
 
 function WorkflowDiagram({ flow }) {
   const [svg, setSvg] = useState('')
+  const [error, setError] = useState('')
   const idRef = useRef('diagram-' + flow.id)
 
   useEffect(() => {
@@ -17,10 +18,15 @@ function WorkflowDiagram({ flow }) {
     mermaid
       .render(idRef.current, flow.definition)
       .then((result) => {
-        if (!cancelled) setSvg(result.svg)
+        if (cancelled) return
+        setSvg(result.svg)
+        setError('')
       })
-      .catch(() => {
-        if (!cancelled) setSvg('')
+      .catch((err) => {
+        // 圖畫不出來時要說出原因，不能留一塊空白讓人以為流程沒問題。
+        if (cancelled) return
+        setSvg('')
+        setError(String(err?.message ?? err))
       })
     return () => {
       cancelled = true
@@ -34,6 +40,7 @@ function WorkflowDiagram({ flow }) {
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: svg }}
       />
+      {error && <p className="run-error">流程圖無法產生：{error}</p>}
       <ul className="legend">
         <li>
           <span className="legend-swatch legend-start"></span>系統節點

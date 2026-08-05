@@ -6,6 +6,8 @@ import {
   governanceChain,
 } from './agentBlueprint.js'
 import { authority, authorityNote } from './authority.js'
+import { GovernanceRolesSection } from './governanceSections.jsx'
+import { InquiryAutomationSection } from './inquirySection.jsx'
 import { businessLines, caseLifecycle, channels } from './businessLines.js'
 import {
   categories,
@@ -625,6 +627,8 @@ export function PermissionPage({ onNavigate }) {
 
   return (
     <>
+      <GovernanceRolesSection />
+
       <section className="card-group">
         <h2 className="group-title">人的授權範圍</h2>
         <p className="group-note">{authorityNote}</p>
@@ -713,9 +717,13 @@ export function PermissionPage({ onNavigate }) {
       <section className="card">
         <h2 className="card-title">本版沒有的東西</h2>
         <ul className="dept-list">
-          <li>沒有登入與帳號系統，因此沒有逐人權限控管。</li>
-          <li>沒有後端，權限是流程設計上的約束，不是技術上的強制。</li>
-          <li>要做到技術強制，必須有後端與身分驗證，屬於下一階段。</li>
+          <li>沒有登入與帳號系統，因此角色權限矩陣目前是制度約束，不是技術強制。</li>
+          <li>沒有後端，無法記錄實際的建立人與審核人，職務分離只能靠流程執行。</li>
+          <li>
+            已經在程式裡生效的只有三項：流程中的人工關卡、風險分級（含隱性承諾偵測），
+            以及知識的可引用與可對外條件。
+          </li>
+          <li>要把角色權限做成技術強制，必須有後端與身分驗證，屬於下一階段。</li>
         </ul>
       </section>
     </>
@@ -732,6 +740,8 @@ export function AutomationPage({ onNavigate }) {
 
   return (
     <>
+      <InquiryAutomationSection onNavigate={onNavigate} />
+
       <section className="card-group">
         <h2 className="group-title">目前的自動化程度</h2>
         <p className="group-note">

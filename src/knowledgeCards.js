@@ -2,6 +2,9 @@
 // 只做靜態資料、分類瀏覽、關鍵字搜尋與詳細內容檢視。
 // 未知的公司事實一律使用【請填入】，不得自行補造。
 
+import { blueprint } from './agentBlueprint.js'
+import { knowledgeSensitiveWords } from './governance.js'
+
 export const PLACEHOLDER = '【請填入'
 
 export const hubIntro =
@@ -22,7 +25,7 @@ export const categories = [
 export const statusLabels = { Published: '已發布', Draft: '草稿', Archived: '封存' }
 export const levelLabels = { High: '高', Medium: '中', Low: '低' }
 
-export const knowledgeCards = [
+const rawKnowledgeCards = [
   {
     "id": "COMPANY-001",
     "title": "公司名稱",
@@ -45,7 +48,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": []
   },
   {
@@ -71,7 +74,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "SERVICE-001",
       "POLICY-002"
@@ -100,7 +103,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "POLICY-001",
       "ESC-001"
@@ -129,7 +132,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "FAQ-003"
     ]
@@ -158,7 +161,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "FAQ-006"
     ]
@@ -187,7 +190,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "FAQ-001",
       "FAQ-007",
@@ -219,7 +222,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "SOP-TRAINING-001"
     ]
@@ -250,7 +253,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "FAQ-008",
       "POLICY-007",
@@ -282,7 +285,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "POLICY-006",
       "POLICY-008"
@@ -313,7 +316,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "POLICY-001",
       "POLICY-004"
@@ -343,7 +346,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "COMPANY-002",
       "SERVICE-001",
@@ -376,7 +379,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "SERVICE-001",
       "SERVICE-002",
@@ -407,7 +410,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "COMPANY-004"
     ]
@@ -436,7 +439,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "POLICY-005"
     ]
@@ -464,7 +467,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "POLICY-003",
       "POLICY-011"
@@ -492,7 +495,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "COMPANY-005"
     ]
@@ -520,7 +523,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "SERVICE-001",
       "SOP-CONSULTING-001"
@@ -550,7 +553,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "SERVICE-003",
       "POLICY-007"
@@ -582,7 +585,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "POLICY-001",
       "POLICY-002",
@@ -599,13 +602,13 @@ export const knowledgeCards = [
       "流程"
     ],
     "summary": "顧問專案從需求確認到客戶驗收的處理順序。",
-    "content": "確認客戶需求（人）→ 整理需求與資料 → 進行初步分析 → 草擬顧問方案 → 顧問審核（人）→ 執行輔導（人）→ 整理成果 → 客戶驗收（人）。\n\n附註：專業診斷、最終顧問結論、對客戶提出正式建議與成果驗收，必須由人員負責。",
-    "owner": "顧問專案交付部",
+    "content": "確認客戶需求（人）→ CRM 紀錄整理員整理需求與往來紀錄 → 方案比較分析員做初步分析 → 提案與報價草擬員草擬顧問方案 → 顧問審核（人）→ 執行輔導（人）→ 待辦整理員彙整進度與成果 → 客戶驗收（人）。\n\n附註一：專業診斷、最終顧問結論、對客戶提出正式建議與成果驗收，必須由人員負責。\n附註二：本流程跨部門，草擬與紀錄由客戶開發與行銷部負責，初步分析借重經營策略與決策部，進度彙整借重營運與財務管理部。",
+    "owner": "客戶開發與行銷部",
     "appliesTo": [
-      "需求紀錄員",
-      "專案資料分析員",
-      "顧問報告草擬員",
-      "專案進度整理員"
+      "CRM 紀錄整理員",
+      "方案比較分析員",
+      "提案與報價草擬員",
+      "待辦整理員"
     ],
     "visibility": "Internal",
     "priority": "High",
@@ -615,7 +618,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "SERVICE-001",
       "POLICY-001",
@@ -649,7 +652,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "SERVICE-002",
       "POLICY-008"
@@ -681,7 +684,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "SERVICE-003",
       "POLICY-007",
@@ -710,7 +713,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "COMPANY-003",
       "ESC-001"
@@ -740,7 +743,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "SOP-CUSTOMER-001",
       "TEMPLATE-001",
@@ -771,7 +774,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "FAQ-005",
       "POLICY-011",
@@ -800,7 +803,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "POLICY-006",
       "ESC-001"
@@ -829,7 +832,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "FAQ-004",
       "ESC-001"
@@ -857,7 +860,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "POLICY-004",
       "SERVICE-004"
@@ -888,7 +891,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "SERVICE-003",
       "SOP-GOV-001",
@@ -921,7 +924,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "SERVICE-002",
       "SOP-TRAINING-001"
@@ -941,7 +944,7 @@ export const knowledgeCards = [
     "appliesTo": [
       "提案與報價草擬員",
       "回覆草擬員",
-      "專案進度整理員"
+      "待辦整理員"
     ],
     "visibility": "Internal",
     "priority": "High",
@@ -951,7 +954,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "FAQ-005",
       "POLICY-003"
@@ -980,7 +983,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "POLICY-002",
       "ESC-001"
@@ -1008,7 +1011,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "POLICY-002",
       "ESC-001"
@@ -1036,7 +1039,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": []
   },
   {
@@ -1063,7 +1066,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "POLICY-003"
     ]
@@ -1090,7 +1093,7 @@ export const knowledgeCards = [
     "validFrom": "2026-08-02",
     "validUntil": "",
     "lastUpdated": "2026-08-02",
-    "reviewer": "【請填入】",
+    "reviewer": "SUSU（負責人）",
     "relatedCards": [
       "POLICY-001",
       "POLICY-002",
@@ -1137,7 +1140,63 @@ export function findCard(id) {
   return knowledgeCards.find((card) => card.id === id) ?? null
 }
 
+// 「看得到」「能被 AI 引用」「需人工審核」是三件事，不能用 visibility 一個欄位代表。
+// 這三個欄位在載入時依規則推導，資料裡也可以明寫覆蓋，避免靠人工逐張維護。
+export function cardSensitiveHits(card) {
+  const text = [card.title, card.summary, card.content, ...card.tags].join(' ')
+  return knowledgeSensitiveWords.filter((word) => text.includes(word))
+}
+
+// 三個欄位互不取代：
+//   visibility           誰看得到
+//   allowAIUse           Agent 能不能拿它當判斷依據
+//   canQuoteExternally   能不能原文對外送給客戶
+// 敏感內容擋的是「對外引用」，不是「Agent 讀取」。
+// 升級規則、報價政策這類卡片本來就是要給 Agent 看的，鎖住反而讓 Agent 不知道該轉人工。
+function normalizeCard(raw) {
+  const sensitive = cardSensitiveHits(raw)
+  const placeholder = hasPlaceholder(raw)
+  const allowAIUse = raw.allowAIUse ?? (raw.status === 'Published' && !placeholder)
+  const canQuoteExternally =
+    raw.canQuoteExternally ?? (allowAIUse && sensitive.length === 0 && raw.visibility === 'Public')
+  return {
+    ...raw,
+    allowAIUse,
+    canQuoteExternally,
+    requiresHumanReview: raw.requiresHumanReview ?? (sensitive.length > 0 || !allowAIUse),
+    sensitiveHits: sensitive,
+    hasPlaceholderContent: placeholder,
+  }
+}
+
+export const knowledgeCards = rawKnowledgeCards.map(normalizeCard)
+
 export function countByCategory(value) {
   if (value === 'All') return knowledgeCards.length
   return knowledgeCards.filter((card) => card.category === value).length
+}
+
+// 知識卡片只能指向真實存在的部門、Agent 與其他卡片。
+// 之前出現過指向不存在的部門與 Agent，這裡把檢查寫成程式，避免再靠人工比對。
+export function knowledgeReferenceIssues() {
+  const departmentNames = new Set(blueprint.map((item) => item.department))
+  const agentNames = new Set(blueprint.flatMap((item) => item.agents.map((agent) => agent.name)))
+  const cardIds = new Set(knowledgeCards.map((card) => card.id))
+  const issues = []
+
+  knowledgeCards.forEach((card) => {
+    if (!departmentNames.has(card.owner)) {
+      issues.push(`${card.id} 的負責部門「${card.owner}」不在部門編制內`)
+    }
+    card.appliesTo.forEach((name) => {
+      if (name !== '全部 Agent' && !agentNames.has(name)) {
+        issues.push(`${card.id} 的適用對象「${name}」不是現有 Agent`)
+      }
+    })
+    card.relatedCards.forEach((id) => {
+      if (!cardIds.has(id)) issues.push(`${card.id} 的關聯知識「${id}」不存在`)
+    })
+  })
+
+  return issues
 }

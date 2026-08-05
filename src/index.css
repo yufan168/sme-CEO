@@ -1263,3 +1263,358 @@ body {
   background: #f0eeec;
   color: #9c9490;
 }
+
+/* 治理規則：權限矩陣與風險分級 */
+.gov-principle {
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  border-left: 4px solid var(--brand-gold);
+  background: var(--cream);
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+.gov-role-title {
+  margin-left: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.gov-table-wrap {
+  overflow-x: auto;
+  margin: 8px 0;
+}
+
+.gov-table {
+  width: 100%;
+  min-width: 420px;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.gov-table th,
+.gov-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--line-soft);
+  text-align: left;
+  vertical-align: top;
+  line-height: 1.6;
+}
+
+.gov-table th {
+  background: var(--cream);
+  border-bottom: 1px solid var(--line);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.gov-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.gov-yes {
+  color: #1f6b3a;
+  font-weight: 600;
+}
+
+.gov-no {
+  color: #9c3a2b;
+}
+
+.gov-cond {
+  color: #8a6410;
+}
+
+.gov-deny li {
+  color: #8a3a2b;
+}
+
+.gov-redline li {
+  padding: 6px 0;
+  font-weight: 600;
+}
+
+.gov-words {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.9;
+  word-break: break-word;
+}
+
+.gov-level {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 1px 8px;
+  border-radius: 3px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.gov-level-L3 {
+  background: #fbe6e2;
+  color: #9c3a2b;
+}
+
+.gov-level-L2 {
+  background: var(--brand-gold-soft);
+  color: #7a5806;
+}
+
+.gov-level-L1 {
+  background: #e6f3ea;
+  color: #1f6b3a;
+}
+
+.gov-input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  line-height: 1.7;
+  resize: vertical;
+}
+
+.gov-check {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 10px 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* 表格與長字串不得把版面撐寬：grid 子項預設 min-width auto 會擋住收縮 */
+.dept-card,
+.gov-table-wrap {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Governance Center */
+.gov-stamp {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+
+.gov-cross,
+.gov-sub {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.gov-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 10px 0;
+}
+
+.gov-field {
+  display: flex;
+  flex: 1 1 180px;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.gov-field select,
+.gov-field input {
+  max-width: 100%;
+  padding: 7px 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+}
+
+.gov-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 10px 0;
+}
+
+.gov-checks .gov-check {
+  flex: 0 1 auto;
+  margin: 0;
+}
+
+.gov-allow {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  border-left: 3px solid #1f6b3a;
+  background: #eef7f1;
+  color: #1f6b3a;
+  line-height: 1.7;
+}
+
+.gov-row-active > td {
+  background: var(--brand-gold-soft);
+}
+
+.ghost-button.is-active {
+  border-color: var(--brand-gold);
+  background: var(--brand-gold-soft);
+  font-weight: 600;
+}
+
+.gov-conf {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 1px 8px;
+  border-radius: 3px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.gov-conf-High {
+  background: #e6f3ea;
+  color: #1f6b3a;
+}
+
+.gov-conf-Medium {
+  background: var(--brand-gold-soft);
+  color: #7a5806;
+}
+
+.gov-conf-Low {
+  background: #fbe6e2;
+  color: #9c3a2b;
+}
+
+.gov-level-L0,
+.gov-level-L1 {
+  background: #e6f3ea;
+  color: #1f6b3a;
+}
+
+.gov-level-L4 {
+  background: #f3ddd8;
+  color: #8a2f21;
+}
+
+.gov-deny-text {
+  color: #8a3a2b;
+}
+
+/* 綁定 AI 員工 */
+.bind-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.bind-chip {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  max-width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper);
+  cursor: pointer;
+  line-height: 1.5;
+}
+
+.bind-chip:hover {
+  border-color: var(--brand-gold);
+}
+
+.bind-chip.is-off {
+  background: var(--warm-white);
+  border-style: dashed;
+  color: var(--muted);
+}
+
+.bind-chip.is-locked {
+  background: var(--cream);
+  border-color: var(--line-soft);
+  cursor: default;
+}
+
+.bind-chip.is-locked:hover {
+  border-color: var(--line-soft);
+}
+
+.bind-order {
+  flex: none;
+  min-width: 20px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: right;
+}
+
+.bind-lock {
+  flex: none;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--line-soft);
+  color: var(--brand-brown-mid);
+  font-size: 12px;
+}
+
+.bind-name {
+  min-width: 0;
+  font-size: 14px;
+}
+
+.bind-id {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.run-skipped {
+  margin: 6px 0 0;
+  padding: 6px 10px;
+  border-left: 3px solid var(--line);
+  background: var(--warm-white);
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* 品牌資料匯出 */
+.swatch {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  max-width: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper);
+}
+
+.swatch-dot {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+
+.brand-preview {
+  max-height: 320px;
+  overflow: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre;
+}
